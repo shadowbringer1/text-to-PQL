@@ -1,6 +1,6 @@
 {
     "model_path": "/data0/csu/models/Qwen-Qwen2.5-1.5B-Instruct",
-    "data_path": "/home/csu/text2PQL/PQL_generate/pql_dataset.json",
+    "data_path": "./PQL_generate/pql_dataset.json",
     "save_path": "./checkpoints/qwen-lora-pql",
     "split_ratio": 0.8,
     "num_train_epochs": 20,

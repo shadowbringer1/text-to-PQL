@@ -45,7 +45,7 @@ scene_name_map = {
 python finetune.py configs/train.json
 ```
 
-修改`configs/train.json`文件中的`model_path`参数为基础模型的路径，也可以其他训练超参数等。
+修改`configs/train.json`文件中的`model_path`参数为基础模型的路径，也可以修改文件中的训练超参数等。
 
 ## 模型推理（Inference）
 
