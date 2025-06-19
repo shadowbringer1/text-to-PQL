@@ -1,0 +1,17 @@
+{
+    "model_path": "/data0/csu/models/Qwen-Qwen2.5-1.5B-Instruct",
+    "data_path": "/home/csu/text2PQL/PQL_generate/pql_dataset.json",
+    "save_path": "./checkpoints/qwen-lora-pql",
+    "split_ratio": 0.8,
+    "num_train_epochs": 20,
+    "per_device_train_batch_size": 4,
+    "per_device_eval_batch_size": 4,
+    "gradient_accumulation_steps": 4,
+    "learning_rate": 2e-4,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "lora_dropout": 0.05,
+    "max_length": 1024,
+    "logging_steps": 1
+}
+  
