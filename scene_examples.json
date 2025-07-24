@@ -1,0 +1,64 @@
+{
+    "software_PSI": [
+      {
+        "Chinese_question": "对ida_en_one平台的m_enterprise_1w表和ida_en_two平台的m_security_1w表通过id字段进行隐私求交并查询交集信息",
+        "PQL_query": "SELECT\n\tida_en_one.m_enterprise_1w.balance,\n\tida_en_two.m_security_1w.balance\nFROM\n\tida_en_one.m_enterprise_1w,\n\tida_en_two.m_security_1w\nWHERE\n\tida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id"
+      },
+      {
+        "Chinese_question": "对ida_en_one平台的m_enterprise_1w表、zh_ldp_A表和ida_en_two平台的m_security_1w表通过id字段进行隐私求交并查询交集信息",
+        "PQL_query": "SELECT\n\tida_en_one.zh_ldp_A.id\nFROM\n\tida_en_one.zh_ldp_A,\n\tida_en_one.m_enterprise_1w,\n\tida_en_two.m_security_1w\nWHERE\n\tida_en_one.zh_ldp_A.id = ida_en_one.m_enterprise_1w.id\n\tAND ida_en_one.zh_ldp_A.id = ida_en_two.m_security_1w.id"
+      }
+    ],
+    "software_MPC": [
+      {
+        "Chinese_question": "使用多方安全计算对ida_en_one平台的m_enterprise_1w表中id和ida_en_two平台的m_security_1w表中id值相同行的balance字段的乘积作求和",
+        "PQL_query": "SELECT\n\tSUM(ida_en_one.m_enterprise_1w.balance * ida_en_two.m_security_1w.balance)\nFROM\n\tida_en_one.m_enterprise_1w,\n\tida_en_two.m_security_1w\nWHERE\n\tida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id"
+      }
+    ],
+    "software_PIR": [
+      {
+         "Chinese_question": "设置参数param1，当ida_en_one平台的m_enterprise_1w表中id和param1值相同时输出m_enterprise_1w表的balance列和socialid列",
+         "PQL_query": "SET\n\tparam1 = ?;\n\nSELECT\n\tida_en_one.m_enterprise_1w.balance,\n\tida_en_one.m_enterprise_1w.socialid\nFROM\n\tida_en_one.m_enterprise_1w\nWHERE\n\tida_en_one.m_enterprise_1w.id = param1"
+      }
+    ],
+    "hardware_PSI": [
+        {
+            "Chinese_question": "使用TEE硬件的方式，对ida_en_one平台的m_enterprise_1w表和ida_en_two平台的m_security_1w表通过id字段进行隐私求交并查询交集信息",
+            "PQL_query": "SELECT\n\t/*+ JOIN(TEE) */ \n\tida_en_one.m_enterprise_1w.balance\nFROM\n\tida_en_one.m_enterprise_1w,\n\tida_en_two.m_security_1w\nWHERE\n\tida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id"
+        },
+        {
+            "Chinese_question": "使用TEE硬件的方式，对ida_en_one平台的m_enterprise_1w表、zh_ldp_A表和ida_en_two平台的m_security_1w表通过id字段进行隐私求交并查询交集信息",
+            "PQL_query": "SELECT\n\t/*+ JOIN(TEE) */\n\tida_en_one.zh_ldp_A.id\nFROM\n\tida_en_one.zh_ldp_A,\n\tida_en_one.m_enterprise_1w,\n\tida_en_two.m_security_1w\nWHERE\n\tida_en_one.zh_ldp_A.id = ida_en_one.m_enterprise_1w.id\n\tAND ida_en_one.zh_ldp_A.id = ida_en_two.m_security_1w.id"
+        }
+    ],
+    "hardware_MPC": [
+        {
+            "Chinese_question": "使用TEE硬件的方式，将ida_en_one的m_enterprise_1w表和ida_en_two的m_security_1w表的数据对齐进行计算",
+            "PQL_query": "set tee.ida_en_one.m_enterprise_1w.orderby = id; \nset tee.ida_en_one.m_enterprise_1w.packagesize = 100; \n\nset tee.ida_en_two.m_security_1w.packagesize = 100;\nset tee.ida_en_two.m_security_1w.orderby = id;\n\nselect \n\t/*+ FUNC(TEE) */  \n\tmulonly02(\n\tkey = ida_en_one.m_enterprise_1w.id,\n\ta = ida_en_one.m_enterprise_1w.id, \n\tb = ida_en_two.m_security_1w.id)  \nfrom\n\tida_en_one.m_enterprise_1w,  \n\tida_en_two.m_security_1w"
+        },
+        {
+            "Chinese_question": "使用TEE硬件的方式，当ida_en_one的m_enterprise_1w表和ida_en_two的m_security_1w表的id相同时，计算m_enterprise_1w.id与m_security_1w.id的乘积",
+            "PQL_query": "set tee.ida_en_one.m_enterprise_1w.orderby = id;\nset tee.ida_en_one.m_enterprise_1w.packagesize = 100;\n\nset tee.ida_en_two.m_security_1w.packagesize = 100;\nset tee.ida_en_two.m_security_1w.orderby = id;\n\nselect\n\t/*+ FUNC(TEE) JOIN(TEE)*/\n\tmulonly02(\n\tkey = ida_en_one.m_enterprise_1w.id,\n\ta = ida_en_one.m_enterprise_1w.id, \n\tb = ida_en_two.m_security_1w.id)  \nfrom\n\tida_en_one.m_enterprise_1w,  \n\tida_en_two.m_security_1w\nwhere\n\tida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id"
+
+        }
+    ],
+    "hardware_PIR": [
+        {
+            "Chinese_question": "设置参数param1，使用TEE硬件的方式，当ida_en_one平台的m_enterprise_1w表中id和param1值相同时输出m_enterprise_1w表的balance列和socialid列",
+            "PQL_query": "SET\n\tparam1 = ?;\n\nSELECT\n\t/*+ FILTER(TEE) */\n\tida_en_one.m_enterprise_1w.balance,\n\tida_en_one.m_enterprise_1w.socialid\nFROM\n\tida_en_one.m_enterprise_1w\nWHERE\n\tida_en_one.m_enterprise_1w.id = param1"
+        }
+    ],
+    "hardware_PIRMPC": [
+        {
+            "Chinese_question": "设置参数t1和t2，使用TEE硬件的方式，当ida_en_one平台的m_enterprise_1w表中id和t1值相同时输出m_enterprise_1w表的balance和t2相加的值",
+            "PQL_query": "SET\n\tt1 = ?;\n\nSET\n\tt2 = ?;\n\nSELECT \n\t/*+ FULLY_COV(TEE) */\n\tpirmpc001(\n\t\tida_en_one.m_enterprise_1w.balance,\n\t\tt2\n\t)\nFROM\n\tida_en_one.m_enterprise_1w\nWHERE\n\tida_en_one.m_enterprise_1w.id = t1"
+        }
+    ],
+    "Federated_learning": [
+        {
+            "Chinese_question": "当plat1平台的atest表中id和plat2平台的btest表中id值相同时，使用plat2.btest表的y列为标签，plat1.atest表和plat2.btest表的所有列为特征值，进行HELR联邦学习训练",
+            "PQL_query": "SELECT \n\t/*+ JOIN(FL) */  \n\tTRAIN(model_name=HELR,  \n\t      label=plat2.btest.y,  \n\t      features=[plat1.atest.*, plat2.btest.*]) \nFROM \n\tplat1.atest,  \n\tplat2.btest   \nWHERE \n\tplat1.atest.id = plat2.btest.id;"
+        }
+    ]
+}
+  

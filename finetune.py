@@ -23,31 +23,52 @@ scene_name_map = {
     "Federated_learning": "联邦学习"
 }
 
-def build_prompt(scene_name, chinese_question):
+def build_prompt(scene_name, chinese_question, scene_examples=None):
     scene_desc = scene_name_map.get(scene_name, "未知场景")
-    return f"""你是一个专注于{scene_desc}任务的PQL生成助手，只需输出一条合法的PQL语句，不要添加任何解释或注释。请根据下方中文问题直接生成对应的PQL语句。
+    prompt = f"""你是一个专注于“{scene_desc}”任务的 PQL 查询生成助手。请严格按照以下要求完成任务：
 
-问题：{chinese_question}
-PQL："""
+- 仅输出一条 **完整且可执行的 PQL 查询语句**
+- **不要添加任何解释、说明、注释或格式提示**
+- 输出结果以 `PQL：` 开头
 
-def load_and_split_data(path: str, split_ratio=0.8):
-    with open(path, "r", encoding="utf-8") as f:
+"""
+    if scene_examples:
+        n = len(scene_examples)
+        prompt += f"以下是该场景的 {n} 个示例：\n"
+        for ex in scene_examples:
+            prompt += f"问题：{ex['Chinese_question']}\nPQL：{ex['PQL_query']}\n"
+    else:
+        prompt += "该场景暂无示例。\n"
+
+    prompt += f"\n请根据下方问题直接生成对应的 PQL 查询语句：\n问题：{chinese_question}\nPQL："
+    return prompt
+
+def load_and_split_data(data_path: str, example_path: str, split_ratio=0.8):
+    with open(data_path, "r", encoding="utf-8") as f:
         raw_data = json.load(f)
+
+    with open(example_path, "r", encoding="utf-8") as f:
+        scene_examples = json.load(f)
 
     train_samples, val_samples = [], []
 
     for scene, items in raw_data.items():
-        total = items
-        random.shuffle(total)
-        split_idx = int(len(total) * split_ratio)
-        for item in total[:split_idx]:
+        random.shuffle(items)
+        split_idx = int(len(items) * split_ratio)
+        train_items = items[:split_idx]
+        val_items = items[split_idx:]
+
+        examples = scene_examples.get(scene, [])
+
+        for item in train_items:
             train_samples.append({
-                "input": build_prompt(scene, item["Chinese_question"]),
+                "input": build_prompt(scene, item["Chinese_question"], examples),
                 "label": item["PQL_query"]
             })
-        for item in total[split_idx:]:
+
+        for item in val_items:
             val_samples.append({
-                "input": build_prompt(scene, item["Chinese_question"]),
+                "input": build_prompt(scene, item["Chinese_question"], examples),
                 "label": item["PQL_query"]
             })
 
@@ -87,7 +108,11 @@ def main():
     model = get_peft_model(model, lora_config)
     model.print_trainable_parameters()
 
-    train_dataset, val_dataset = load_and_split_data(cfg["data_path"], cfg["split_ratio"])
+    train_dataset, val_dataset = load_and_split_data(
+        cfg["data_path"],
+        cfg["example_path"],
+        cfg["split_ratio"]
+    )
     train_dataset = train_dataset.map(lambda x: tokenize_function(x, tokenizer, cfg["max_length"]), remove_columns=["input", "label"])
     val_dataset = val_dataset.map(lambda x: tokenize_function(x, tokenizer, cfg["max_length"]), remove_columns=["input", "label"])
 
@@ -103,7 +128,7 @@ def main():
         logging_steps=cfg["logging_steps"],
         evaluation_strategy="epoch",
         save_strategy="epoch",
-        save_total_limit=2,
+        save_total_limit=3,
         report_to="none",
         load_best_model_at_end=True
     )

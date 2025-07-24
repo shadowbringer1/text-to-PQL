@@ -54,11 +54,11 @@ python finetune.py configs/train.json
 ```bash
 python inference.py \
   --base_model_path /data0/csu/models/Qwen-Qwen2.5-1.5B-Instruct \
-  --lora_model_path ./checkpoints/qwen-lora-pql/final
+  --lora_model_path ./checkpoints/qwen-lora-pql/checkpoint-333
 ```
 
 - `--base_model_path`：填写原始基础模型的路径（如 Qwen2.5-1.5B-Instruct）
-- `--lora_model_path`：填写你训练后保存的 LoRA 权重路径（默认为 `save_path/final`）
+- `--lora_model_path`：填写你训练后保存的 LoRA 权重路径
 
 ### 🔁 交互式使用方式
 
@@ -71,11 +71,18 @@ python inference.py \
 ### 示例：
 
 ```text
-请输入场景名（如 software_PSI），或输入 exit 退出：software_MPC
-请输入中文自然语言问题：在secure_exam平台的exam_results表中按年级分组的学生最高成绩是多少?
+请输入场景名（如 software_PSI），或输入 exit 退出：software_PIR
+请输入中文自然语言问题：如何统计在ida_en_one平台的m_enterprise_1w表中余额超过1000的记录数?
 
 生成的PQL查询：
-SELECT secure_exam.exam_results.grade, MAX(secure_exam.exam_results.score) FROM secure_exam.exam_results GROUP BY secure_exam.exam_results.grade;
+ SELECT COUNT(*) FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.balance > 1000;
+ --------------------------------------------------
+请输入场景名（如 software_PSI），或输入 exit 退出：software_MPC
+请输入中文自然语言问题：当ida_en_one平台m_enterprise_1w表和ida_en_two平台m_security_1w表的id相同时,通过安全计算求balance字段的和。
+生成的PQL查询：
+ SELECT ida_en_one.m_enterprise_1w.balance + ida_en_two.m_security_1w.balance FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;
+--------------------------------------------------
+请输入场景名（如 software_PSI），或输入 exit 退出：exit
 ```
 
 你可以连续多轮交互，输入 `exit` 退出。
