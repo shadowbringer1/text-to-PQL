@@ -14,12 +14,14 @@ scene_name_map = {
     "Federated_learning": "联邦学习"
 }
 
+
 def build_prompt(scene_key, chinese_question):
     scene_desc = scene_name_map.get(scene_key, "未知场景")
     return f"""你是一个专注于{scene_desc}任务的PQL生成助手，只需输出一条合法的PQL语句，不要添加任何解释或注释。请根据下方中文问题直接生成对应的PQL语句。
 
 问题：{chinese_question}
 PQL："""
+
 
 def generate_pql(model, tokenizer, prompt, max_new_tokens=64):
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
@@ -37,6 +39,7 @@ def generate_pql(model, tokenizer, prompt, max_new_tokens=64):
             response = response.split(stop_phrase)[0].strip()
     return response
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--base_model_path", type=str, required=True)
@@ -48,6 +51,14 @@ def main():
         args.base_model_path,
         torch_dtype=torch.float16,
         device_map="auto",
+        trust_remote_code=True
+    )
+
+    base_model = AutoModelForCausalLM.from_pretrained(
+        args.base_model_path,
+        device_map="auto",
+        load_in_8bit=True,
+        low_cpu_mem_usage=True,
         trust_remote_code=True
     )
     model = PeftModel.from_pretrained(base_model, args.lora_model_path)
@@ -65,6 +76,7 @@ def main():
         output = generate_pql(model, tokenizer, prompt)
         print("\n生成的PQL查询：\n", output)
         print("-" * 50)
+
 
 if __name__ == "__main__":
     main()

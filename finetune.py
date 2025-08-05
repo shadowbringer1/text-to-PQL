@@ -23,12 +23,14 @@ scene_name_map = {
     "Federated_learning": "联邦学习"
 }
 
+
 def build_prompt(scene_name, chinese_question):
     scene_desc = scene_name_map.get(scene_name, "未知场景")
     return f"""你是一个专注于{scene_desc}任务的PQL生成助手，只需输出一条合法的PQL语句，不要添加任何解释或注释。请根据下方中文问题直接生成对应的PQL语句。
 
 问题：{chinese_question}
 PQL："""
+
 
 def load_and_split_data(path: str, split_ratio=0.8):
     with open(path, "r", encoding="utf-8") as f:
@@ -53,11 +55,13 @@ def load_and_split_data(path: str, split_ratio=0.8):
 
     return Dataset.from_list(train_samples), Dataset.from_list(val_samples)
 
+
 def tokenize_function(example, tokenizer, max_length):
     full_text = example["input"] + example["label"]
     model_inputs = tokenizer(full_text, max_length=max_length, truncation=True, padding="max_length")
     model_inputs["labels"] = model_inputs["input_ids"].copy()
     return model_inputs
+
 
 def main():
     config_path = sys.argv[1]
@@ -88,8 +92,10 @@ def main():
     model.print_trainable_parameters()
 
     train_dataset, val_dataset = load_and_split_data(cfg["data_path"], cfg["split_ratio"])
-    train_dataset = train_dataset.map(lambda x: tokenize_function(x, tokenizer, cfg["max_length"]), remove_columns=["input", "label"])
-    val_dataset = val_dataset.map(lambda x: tokenize_function(x, tokenizer, cfg["max_length"]), remove_columns=["input", "label"])
+    train_dataset = train_dataset.map(lambda x: tokenize_function(x, tokenizer, cfg["max_length"]),
+                                      remove_columns=["input", "label"])
+    val_dataset = val_dataset.map(lambda x: tokenize_function(x, tokenizer, cfg["max_length"]),
+                                  remove_columns=["input", "label"])
 
     training_args = TrainingArguments(
         output_dir=cfg["save_path"],
@@ -121,6 +127,7 @@ def main():
 
     model.save_pretrained(os.path.join(cfg["save_path"], "final"))
     tokenizer.save_pretrained(os.path.join(cfg["save_path"], "final"))
+
 
 if __name__ == "__main__":
     main()
