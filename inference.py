@@ -41,6 +41,7 @@ def build_prompt(scene_name, chinese_question, scene_examples=None):
     prompt += f"\n请根据下方问题直接生成对应的 PQL 查询语句：\n问题：{chinese_question}\nPQL："
     return prompt
 
+
 # 调用模型生成
 def generate_pql(model, tokenizer, prompt, max_new_tokens=1024):
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
@@ -102,6 +103,7 @@ def main():
 
         print("\n生成的PQL查询：\n", output)
         print("-" * 50)
+
 
 if __name__ == "__main__":
     main()
