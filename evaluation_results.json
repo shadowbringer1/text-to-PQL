@@ -1,0 +1,1682 @@
+[
+  {
+    "scene": "software_MPC",
+    "question": "我们是否可以通过MPC来计算crypto_secure平台中financial_transactions表的交易值中位数？",
+    "target_pql": "SELECT MEDIAN(crypto_secure.financial_transactions.transaction_value) FROM crypto_secure.financial_transactions;",
+    "predicted_pql": "SELECT MEDIAN(crypto_secure.financial_transactions.transaction_value) FROM crypto_secure.financial_transactions;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "如何通过TEE从ida_inventory平台的logs_table中获取param_item_code对应的仓库库存详情？",
+    "target_pql": "SELECT ida_inventory.logs_table.* WHERE ida_inventory.logs_table.item_code = param_item_code USING TEE;",
+    "predicted_pql": "SELECT ida_inventory.logs_table.inventory, ida_inventory.logs_table.location FROM ida_inventory.logs_table WHERE ida_inventory.logs_table.item_code = param_item_code USING TEE;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "怎样从ida_en_two平台的m_enterprise_1w表中筛选出社交账号以特定前缀开头的用户？",
+    "target_pql": "SELECT * FROM ida_en_two.m_enterprise_1w WHERE ida_en_two.m_enterprise_1w.socialid LIKE '$param1%'",
+    "predicted_pql": "SELECT * FROM ida_en_two.m_enterprise_1w WHERE ida_en_two.m_enterprise_1w.socialid LIKE '$param1%'",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "如何在TEE环境中查询user_platform库中user_data表里，状态字段与参数stat相符的活跃用户总数？",
+    "target_pql": "SET stat = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(count(user_platform.user_data.user_id)) FROM user_platform.user_data WHERE user_platform.user_data.status = stat",
+    "predicted_pql": "SET stat = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(count(user_platform.user_data.user_id)) FROM user_platform.user_data WHERE user_platform.user_data.status = stat;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "请问如何在plat37的transaction_stats表和plat38的cost_analysis表上应用HELR进行训练，以order_ref作为公共字段，重点分析盈利能力？",
+    "target_pql": "SELECT TRAIN(model_name=HELR, label=plat37.transaction_stats.profit_margin, features=[plat37.transaction_stats.*, plat38.cost_analysis.*]) FROM plat37.transaction_stats, plat38.cost_analysis WHERE plat37.transaction_stats.order_ref = plat38.cost_analysis.order_ref;",
+    "predicted_pql": "SELECT TRAIN(model_name=HELR, label=plat38.cost_analysis.profit_margin, features=[plat37.transaction_stats.*, plat38.cost_analysis.*]) FROM plat37.transaction_stats, plat38.cost_analysis WHERE plat37.transaction_stats.order_ref = plat38.cost_analysis.order_ref;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "在使用TEE时，如何计算university_X库中exam_scores表中排除“intro”课程后的平均分？",
+    "target_pql": "select /*+ FUNC(TEE) */ avg(a = university_X.exam_scores.score) from university_X.exam_scores where university_X.exam_scores.course != 'intro';",
+    "predicted_pql": "select /*+ FUNC(TEE) */ avg(a = university_X.exam_scores.score) from university_X.exam_scores where course_name != 'intro';",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "如何获取ida_en_one平台和ida_en_two平台中具有相同socialid的条目，并整合它们的相关信息？",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.socialid, ida_en_one.m_enterprise_1w.balance, ida_en_two.m_security_1w.balance FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.socialid = ida_en_two.m_security_1w.socialid",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.balance, ida_en_two.m_security_1w.balance FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.socialid = ida_en_two.m_security_1w.socialid;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "使用plat1的广告点击数据(ad_clicks)和plat2的用户会话数据(user_sessions)训练HESB模型，并以plat2.user_sessions.session_duration作为标签进行二分类评估。",
+    "target_pql": "SELECT SEQUENCE(TRAIN(model_name=HESB, label=plat2.user_sessions.session_duration, features=[plat1.ad_clicks.*, plat2.user_sessions.*]), EVAL(default_eval_setting=binary)) FROM plat1.ad_clicks, plat2.user_sessions WHERE plat1.ad_clicks.session_id = plat2.user_sessions.session_id;",
+    "predicted_pql": "SELECT SEQUENCE(TRAIN(model_name=HESB, label=plat2.user_sessions.session_duration, features=[plat1.ad_clicks.*, plat2.user_sessions.*]), EVAL(default_eval_setting=binary)) FROM plat1.ad_clicks, plat2.user_sessions WHERE plat1.ad_clicks.session_id = plat2.user_sessions.session_id;",
+    "correct": true
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "在plat5的表`sales_data`和plat6的表`product_data`中，通过`product_id`字段进行关联，评估HELR模型，以预测`sales_quantity`字段的值。",
+    "target_pql": "SELECT EVAL(eval_setting=default, model_name=HELR, label=plat6.sales_data.sales_quantity) FROM plat5.sales_data, plat6.product_data WHERE plat5.sales_data.product_id = plat6.product_data.product_id;",
+    "predicted_pql": "SELECT EVAL(model_name=HELR, label=plat5.sales_data.sales_quantity) FROM plat5.sales_data, plat6.product_data WHERE plat5.sales_data.product_id = plat6.product_data.product_id;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "利用plat1的user_logs表和plat2的purchases表，训练一个HELR模型，其中标签字段为plat2.purchases.amount。",
+    "target_pql": "SELECT TRAIN(model_name=HELR, label=plat2.purchases.amount, features=[plat1.user_logs.*, plat2.purchases.*]) FROM plat1.user_logs, plat2.purchases WHERE plat1.user_logs.session_id = plat2.purchases.session_id;",
+    "predicted_pql": "SELECT TRAIN(model_name=HELR, label=plat2.purchases.amount, features=[plat1.user_logs.*, plat2.purchases.*]) FROM plat1.user_logs, plat2.purchases WHERE plat1.user_logs.user_id = plat2.purchases.user_id;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "如何使用联邦模型对数据进行预测分析，其中数据来源于plat1的energy_consumption和plat2的sustainability_metrics，预测的标签为plat2.sustainability_metrics.green_score？",
+    "target_pql": "SELECT PREDICT(model_name=HESB, model_guest=plat2.sustainability_metrics, model_id=202303231004509428550, label=plat2.sustainability_metrics.green_score) FROM plat1.energy_consumption, plat2.sustainability_metrics WHERE plat1.energy_consumption.site_id = plat2.sustainability_metrics.site_id;",
+    "predicted_pql": "SELECT PREDICT(model_name=HESB, model_guest=plat2.sustainability_metrics, model_id=202303221004509428550, label=plat2.sustainability_metrics.green_score) FROM plat1.energy_consumption, plat2.sustainability_metrics WHERE plat1.energy_consumption.usage_id = plat2.sustainability_metrics.usage_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "利用TEE技术，基于item_id字段，将ida_en_one平台的m_inventory_1w表与ida_en_two平台的m_sales_log_1w表进行私密关联，以查询可用数量。",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.m_inventory_1w.quantity FROM ida_en_one.m_inventory_1w, ida_en_two.m_sales_log_1w WHERE ida_en_one.m_inventory_1w.item_id = ida_en_two.m_sales_log_1w.item_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.m_inventory_1w.quantity FROM ida_en_one.m_inventory_1w, ida_en_two.m_sales_log_1w WHERE ida_en_one.m_inventory_1w.item_id = ida_en_two.m_sales_log_1w.item_id;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "请先进行特征缩放，然后在平台 plat1 的 scores 表和平台 plat2 的 feedback 表上进行 HELR 模型训练，目标变量为 plat2.feedback.rating。",
+    "target_pql": "SELECT Sequence(FE(model_name=HESCALE, label=plat2.feedback.rating, features=[plat1.scores.*, plat2.feedback.*]), TRAIN(model_name=HELR, label=plat2.feedback.rating, features=[plat1.scores.*, plat2.feedback.*])) FROM plat1.scores, plat2.feedback WHERE plat1.scores.id = plat2.feedback.id;",
+    "predicted_pql": "SELECT SEQUENCE(FE(model_name=HESCALE, label=plat2.feedback.rating), TRAIN(model_name=HELR, label=plat2.feedback.rating)) FROM plat1.scores, plat2.feedback WHERE plat1.scores.score_id = plat2.feedback.score_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "利用安全计算，从m_enterprise_1w和m_security_1w中查询共有的时间属性。",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.time, ida_en_two.m_security_1w.time FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.time, ida_en_two.m_security_1w.time FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.time = ida_en_two.m_security_1w.time;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "请计算ida_en_thirteen平台的sales_data表与ida_en_fourteen平台的customer_records表中共有的customer_ids。",
+    "target_pql": "SELECT ida_en_thirteen.sales_data.customer_id FROM ida_en_thirteen.sales_data, ida_en_fourteen.customer_records WHERE ida_en_thirteen.sales_data.customer_id = ida_en_fourteen.customer_records.customer_id",
+    "predicted_pql": "SELECT ida_en_thirteen.sales_data.customer_id FROM ida_en_thirteen.sales_data, ida_en_fourteen.customer_records WHERE ida_en_thirteen.sales_data.customer_id = ida_en_fourteen.customer_records.customer_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在 ida_en_one 平台的 m_logs_1w 表中，log_id 与 param8 匹配的最新记录的时间戳是多少？",
+    "target_pql": "SELECT MAX(ida_en_one.m_logs_1w.entry_timestamp) FROM ida_en_one.m_logs_1w WHERE ida_en_one.m_logs_1w.log_id = $param8",
+    "predicted_pql": "SELECT MAX(ida_en_one.m_logs_1w.timestamp) FROM ida_en_one.m_logs_1w WHERE ida_en_one.m_logs_1w.log_id = $param8;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "当ida_en_one平台的m_enterprise_1w表与ida_en_two平台的m_security_1w表中存在相同的id时，通过安全计算获取id、balance和socialid字段的加权和。",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.id, (0.1*ida_en_one.m_enterprise_1w.balance) + (0.2*ida_en_two.m_security_1w.balance) + (0.1*ida_en_one.m_enterprise_1w.socialid) + (0.4*ida_en_two.m_security_1w.socialid) FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.id, (0.5 * ida_en_one.m_enterprise_1w.balance) + (0.5 * ida_en_two.m_security_1w.socialid) FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在TEE环境中，计算ida_en_one平台的m_enterprise_1w表中，id为t1的记录，其balance字段加上t2后的调整结果。",
+    "target_pql": "SET t1 = ?; SET t2 = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc001(ida_en_one.m_enterprise_1w.balance, t2) FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.id = t1",
+    "predicted_pql": "SET t1 = ?; SET t2 = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc001(ida_en_one.m_enterprise_1w.balance, t2) FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.id = t1;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "能否通过安全计算统计ida_en_one平台的m_enterprise_1w表与ida_en_two平台的m_security_1w表中，id字段重复时对应balance字段乘积的数量？",
+    "target_pql": "SELECT COUNT(ida_en_one.m_enterprise_1w.balance * ida_en_two.m_security_1w.balance) FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "predicted_pql": "SELECT COUNT(ida_en_one.m_enterprise_1w.balance * ida_en_two.m_security_1w.balance) FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "correct": true
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "利用plat1的销售记录表(sales_records)和plat2的营销活动表(marketing_campaigns)，以plat2.marketing_campaigns表中的conversion_rate字段作为标签，训练HESB联邦模型。",
+    "target_pql": "SELECT TRAIN(model_name=HESB, label=plat2.marketing_campaigns.conversion_rate, features=[plat1.sales_records.*, plat2.marketing_campaigns.*]) FROM plat1.sales_records, plat2.marketing_campaigns WHERE plat1.sales_records.campaign_id = plat2.marketing_campaigns.campaign_id;",
+    "predicted_pql": "SELECT TRAIN(model_name=HESB, label=plat2.marketing_campaigns.conversion_rate, features=[plat1.sales_records.*, plat2.marketing_campaigns.*]) FROM plat1.sales_records, plat2.marketing_campaigns WHERE plat1.sales_records.campaign_id = plat2.marketing_campaigns.campaign_id;",
+    "correct": true
+  },
+  {
+    "scene": "software_PIR",
+    "question": "怎么计算ida_en_one平台中m_enterprise_1w表的所有记录的平均余额？",
+    "target_pql": "SELECT AVG(ida_en_one.m_enterprise_1w.balance) AS average_balance FROM ida_en_one.m_enterprise_1w",
+    "predicted_pql": "SELECT AVG(ida_en_one.m_enterprise_1w.balance) AS average_balance FROM ida_en_one.m_enterprise_1w",
+    "correct": true
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "使用TEE硬件时，如何对company_A和company_B的projects_table表中的budget列进行汇总？",
+    "target_pql": "select /*+ FUNC(TEE) */ sumonly02(key = company_A.projects_table.project_id, a = company_A.projects_table.budget, b = company_B.projects_table.budget) from company_A.projects_table, company_B.projects_table;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ sumonly02(key = company_A.projects_table.project_id, a = company_A.projects_table.budget, b = company_B.projects_table.budget) from company_A.projects_table, company_B.projects_table;",
+    "correct": true
+  },
+  {
+    "scene": "software_PIR",
+    "question": "如何计算ida_en_two平台的m_purchases_1w表中buyer_id与param11匹配的购买金额总和？",
+    "target_pql": "SELECT SUM(ida_en_two.m_purchases_1w.purchase_amount) FROM ida_en_two.m_purchases_1w WHERE ida_en_two.m_purchases_1w.buyer_id = $param11",
+    "predicted_pql": "SELECT SUM(ida_en_two.m_purchases_1w.purchase_amount) FROM ida_en_two.m_purchases_1w WHERE ida_en_two.m_purchases_1w.buyer_id = $param11;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "利用TEE硬件，从gaming_system平台的games_scoreboard表中计算与指定关卡ID匹配的平均分数。",
+    "target_pql": "SET level = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc014(avg(gaming_system.games_scoreboard.score)) FROM gaming_system.games_scoreboard WHERE gaming_system.games_scoreboard.level_id = level",
+    "predicted_pql": "SET level_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc005(avg(gaming_system.games_scoreboard.score)) FROM gaming_system.games_scoreboard WHERE gaming_system.games_scoreboard.level_id = level_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "在TEE环境中，如何查询ida_en_orders平台的m_order_info表中与param_order_ref相匹配的订单id和总金额？",
+    "target_pql": "SELECT ida_en_orders.m_order_info.order_id, ida_en_orders.m_order_info.total_amount WHERE ida_en_orders.m_order_info.order_ref = param_order_ref USING TEE;",
+    "predicted_pql": "SELECT ida_en_orders.m_order_info.order_id, ida_en_orders.m_order_info.total_amount WHERE ida_en_orders.m_order_info.order_ref = param_order_ref USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "software_MPC",
+    "question": "如何在mpc_server平台的transactions表中统计每个customer_id的平均交易金额？",
+    "target_pql": "SELECT secure_platform.transactions.customer_id, AVG(secure_platform.transactions.amount) FROM secure_platform.transactions GROUP BY secure_platform.transactions.customer_id;",
+    "predicted_pql": "SELECT AVG(secure_platform.transactions.amount) FROM secure_platform.transactions;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "如何利用plat31的employee_records来训练HELR模型，从而提升plat32的productivity_scores，并通过匹配emp_code进行数据整合？",
+    "target_pql": "SELECT TRAIN(model_name=HELR, label=plat32.productivity_scores.total_score, features=[plat31.employee_records.*, plat32.productivity_scores.*]) FROM plat31.employee_records, plat32.productivity_scores WHERE plat31.employee_records.emp_code = plat32.productivity_scores.emp_code;",
+    "predicted_pql": "SELECT TRAIN(model_name=HELR, label=plat32.productivity_scores.score, features=[plat31.employee_records.*, plat32.productivity_scores.*]) FROM plat31.employee_records, plat32.productivity_scores WHERE plat31.employee_records.emp_code = plat32.productivity_scores.emp_code;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "请展示ida_en_one平台中m_salary_1w表内与param4字段匹配的职位的平均薪资。",
+    "target_pql": "SELECT AVG(ida_en_one.m_salary_1w.salary) FROM ida_en_one.m_salary_1w WHERE ida_en_one.m_salary_1w.position = $param4",
+    "predicted_pql": "SELECT AVG(ida_en_one.m_salary_1w.salary) FROM ida_en_one.m_salary_1w WHERE ida_en_one.m_salary_1w.position = $param4;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "如何利用TEE硬件安全地计算daily_sales_one和daily_sales_two中的每日销售总额？",
+    "target_pql": "select /*+ FUNC(TEE) */ sumonly02(key = daily_sales_one.transaction_id, a = daily_sales_one.amount, b = daily_sales_two.amount) from daily_sales_one, daily_sales_two;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ sumonly02(key = daily_sales_one.sale_id, a = daily_sales_one.amount, b = daily_sales_two.amount) from daily_sales_one, daily_sales_two;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "使用安全计算功能，分析ida_en_six平台中m_sales_1q表按客户群体划分的租户收入占比。",
+    "target_pql": "SELECT segment, SUM(revenue) / (SELECT SUM(revenue) FROM ida_en_six.m_sales_1q) AS ratio FROM ida_en_six.m_sales_1q GROUP BY segment;",
+    "predicted_pql": "SELECT tenant, SUM(revenue) / (SELECT SUM(revenue) FROM ida_en_six.m_sales_1q) AS revenue_percentage FROM ida_en_six.m_sales_1q GROUP BY tenant;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "请对plat1.orders和plat2.shipments的数据进行联邦特征工程，并以plat2.shipments.status为目标进行HELR训练。",
+    "target_pql": "SELECT Sequence(FE(model_name=HESCALE, label=plat2.shipments.status, features=[plat1.orders.*, plat2.shipments.*]), TRAIN(model_name=HELR, label=plat2.shipments.status, features=[plat1.orders.*, plat2.shipments.*])) FROM plat1.orders, plat2.shipments WHERE plat1.orders.order_id = plat2.shipments.shipment_id;",
+    "predicted_pql": "SELECT Sequence(FE(model_name=HESCALE,label=plat2.shipments.status), TRAIN(model_name=HELR,label=plat2.shipments.status)) FROM plat1.orders, plat2.shipments WHERE plat1.orders.order_id = plat2.shipments.order_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "怎么在ida_en_one数据库的user_subscription表中查询用户的订阅类型和订阅到期日期？",
+    "target_pql": "SELECT ida_en_one.user_subscription.subscription_type, ida_en_one.user_subscription.expiration_date FROM ida_en_one.user_subscription WHERE ida_en_one.user_subscription.user_id = $param1",
+    "predicted_pql": "SELECT ida_en_one.user_subscription.subscription_type, ida_en_one.user_subscription.expiry_date FROM ida_en_one.user_subscription WHERE ida_en_one.user_subscription.user_id = $param1;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "利用TEE硬件，获取accounts_platform的expense_table中项目ID字段等于输入的prj_id时对应的总开支。",
+    "target_pql": "SET prj_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(sum(accounts_platform.expense_table.expense_amount)) FROM accounts_platform.expense_table WHERE accounts_platform.expense_table.project_id = prj_id",
+    "predicted_pql": "SET prj_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(sum(accounts_platform.expense_table.cost)) FROM accounts_platform.expense_table WHERE accounts_platform.expense_table.project_id = prj_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "在使用MPC时，secure_trade平台中transactions表的purchase_amount字段的总和是多少？",
+    "target_pql": "SELECT SUM(secure_trade.transactions.purchase_amount) FROM secure_trade.transactions;",
+    "predicted_pql": "SELECT SUM(secure_trade.transactions.purchase_amount) FROM secure_trade.transactions;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "借助安全TEE硬件，从ida_en_sensor平台的t_sensor_readings表中获取与param_sensor_id匹配的传感器的温度值及其对应的时间戳。",
+    "target_pql": "SELECT ida_en_sensor.t_sensor_readings.temperature, ida_en_sensor.t_sensor_readings.timestamp WHERE ida_en_sensor.t_sensor_readings.sensor_id = param_sensor_id USING TEE;",
+    "predicted_pql": "SELECT ida_en_sensor.t_sensor_readings.temperature, ida_en_sensor.t_sensor_readings.timestamp WHERE ida_en_sensor.t_sensor_readings.sensor_id = param_sensor_id USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "software_PIR",
+    "question": "怎么从ida_en_two平台的m_enterprise_1w表中查询社交账号与指定值相匹配的用户详细信息？",
+    "target_pql": "SELECT * FROM ida_en_two.m_enterprise_1w WHERE ida_en_two.m_enterprise_1w.socialid = '$param1'",
+    "predicted_pql": "SELECT ida_en_two.m_enterprise_1w.* FROM ida_en_two.m_enterprise_1w WHERE ida_en_two.m_enterprise_1w.socialid = $param1",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "在平台ida_en_one的m_enterprise_1w表中，当使用TEE且ID等于param1时，查询对应的社会ID和余额。",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.socialid, ida_en_one.m_enterprise_1w.balance WHERE ida_en_one.m_enterprise_1w.id = param1 USING TEE;",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.socialid, ida_en_one.m_enterprise_1w.balance WHERE ida_en_one.m_enterprise_1w.id = param1 USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "software_PSI",
+    "question": "如何从ida_en_thirtythree平台的physical_inventory表与ida_en_thirtyfour平台的asset_management表中提取交集的asset_tags？",
+    "target_pql": "SELECT ida_en_thirtythree.physical_inventory.asset_tag FROM ida_en_thirtythree.physical_inventory, ida_en_thirtyfour.asset_management WHERE ida_en_thirtythree.physical_inventory.asset_tag = ida_en_thirtyfour.asset_management.asset_tag",
+    "predicted_pql": "SELECT ida_en_thirtythree.physical_inventory.asset_tag FROM ida_en_thirtythree.physical_inventory, ida_en_thirtyfour.asset_management WHERE ida_en_thirtythree.physical_inventory.asset_tag = ida_en_thirtyfour.asset_management.asset_tag;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "在plat1.atest和plat2.btest这两个数据集上开展跨平台特征工程和HELR模型训练。",
+    "target_pql": "SELECT Sequence(FE(model_name=HESCALE,label=plat2.btest.y), TRAIN(model_name=HELR,label=plat2.btest.y)) FROM plat1.atest, plat2.btest WHERE plat1.atest.id = plat2.btest.id;",
+    "predicted_pql": "SELECT Sequence(FE(model_name=HESCALE,label=plat2.btest.y), TRAIN(model_name=HELR,label=plat2.btest.y)) FROM plat1.atest, plat2.btest WHERE plat1.atest.id = plat2.btest.id;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在edu_platform平台的scores表中，通过TEE环境筛选出与参数class_code对应的班级ID的中位数分数。",
+    "target_pql": "SET class_code = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(median(edu_platform.scores.score)) FROM edu_platform.scores WHERE edu_platform.scores.class_id = class_code",
+    "predicted_pql": "SET class_code = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc005(median(edu_platform.scores.score)) FROM edu_platform.scores WHERE edu_platform.scores.class_id = class_code;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "在ida_en_one库的m_enterprise_1w表和ida_en_two库的m_security_1w表中，如何通过TEE安全计算两者id列匹配时的乘积？",
+    "target_pql": "select /*+ FUNC(TEE) */ mulonly02(key = ida_en_one.m_enterprise_1w.id, a = ida_en_one.m_enterprise_1w.id, b = ida_en_two.m_security_1w.id) from ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w where ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "predicted_pql": "select /*+ FUNC(TEE) JOIN(TEE) */ mulonly02(key = ida_en_one.m_enterprise_1w.id, a = ida_en_one.m_enterprise_1w.id, b = ida_en_two.m_security_1w.id) from ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w where ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "在TEE环境下，计算retail_platform平台的customer_info表与service_platform平台的loyalty_program表中客户ID的交集。",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ retail_platform.customer_info.customer_id FROM retail_platform.customer_info, service_platform.loyalty_program WHERE retail_platform.customer_info.customer_id = service_platform.loyalty_program.customer_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ retail_platform.customer_info.customer_id FROM retail_platform.customer_info, service_platform.loyalty_program WHERE retail_platform.customer_info.customer_id = service_platform.loyalty_program.customer_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "在使用TEE技术的情况下，如何安全地查询order_system_A和order_system_B中的共同订单号？",
+    "target_pql": "select /*+ FUNC(TEE) */ intersect(a = order_system_A.orders.number, b = order_system_B.orders.number) from order_system_A.orders, order_system_B.orders;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ intersect(a = order_system_A.orders.order_id, b = order_system_B.orders.order_id) from order_system_A.orders, order_system_B.orders;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "使用MPC计算secure_education平台中quiz_results表的加权得分总和，其中权重系数为math字段0.3，science字段0.7。",
+    "target_pql": "SELECT SUM(0.3 * secure_education.quiz_results.math + 0.7 * secure_education.quiz_results.science) FROM secure_education.quiz_results;",
+    "predicted_pql": "SELECT SUM(secure_education.quiz_results.math * 0.3 + secure_education.quiz_results.science * 0.7) FROM secure_education.quiz_results;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在ida_en_one平台的employment_details表中，如何通过员工ID查询员工的电子邮件和电话号码？",
+    "target_pql": "SELECT ida_en_one.employment_details.email, ida_en_one.employment_details.phone FROM ida_en_one.employment_details WHERE ida_en_one.employment_details.employee_id = $param1",
+    "predicted_pql": "SELECT ida_en_one.employment_details.email, ida_en_one.employment_details.phone_number FROM ida_en_one.employment_details WHERE ida_en_one.employment_details.employee_id = $param1;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "利用plat1平台的t1表数据（t1_data）和plat2平台的t2表数据（t2_data），通过HESB预训练模型（model_id: 202303310101010101）进行预测。",
+    "target_pql": "SELECT PREDICT(model_name=HESB, model_guest=plat2.t2_data, model_id=202303310101010101) FROM plat1.t1_data, plat2.t2_data WHERE plat1.t1_data.key_id = plat2.t2_data.key_id;",
+    "predicted_pql": "SELECT PREDICT(model_name=HESB, model_guest=plat2.t2, model_id=202303310101010101) FROM plat1.t1_data, plat2.t2_data WHERE plat1.t1_data.id = plat2.t2_data.id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "借助TEE硬件，如何安全地统计org_one的hr_records表与org_two的hr_data表中的员工总数？",
+    "target_pql": "select /*+ FUNC(TEE) */ sumonly02(key = org_one.hr_records.employee_id, a = org_one.hr_records.employee_count, b = org_two.hr_data.employee_count) from org_one.hr_records, org_two.hr_data;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ sumonly02(key = org_one.hr_records.employee_id, a = org_one.hr_records.employee_count, b = org_two.hr_data.employee_count) from org_one.hr_records, org_two.hr_data;",
+    "correct": true
+  },
+  {
+    "scene": "software_MPC",
+    "question": "如何通过安全计算分析ida_en_three平台中m_account_1y表的每个租户的平均收入？",
+    "target_pql": "SELECT AVG(ida_en_three.m_account_1y.revenue) FROM ida_en_three.m_account_1y;",
+    "predicted_pql": "SELECT tenant, AVG(income) FROM ida_en_three.m_account_1y GROUP BY tenant;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "在ida_en_one平台的m_enterprise_1w表中，利用TEE提取ID等于param1的社会ID和余额。",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.socialid, ida_en_one.m_enterprise_1w.balance WHERE ida_en_one.m_enterprise_1w.id = param1 USING TEE;",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.socialid, ida_en_one.m_enterprise_1w.balance WHERE ida_en_one.m_enterprise_1w.id = param1 USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "我们需要处理plat1.atest和plat2.btest的数据，用于训练HELR模型，并将btest.y作为标签。",
+    "target_pql": "SELECT TRAIN(model_name=HELR, label=plat2.btest.y, features=[plat1.atest.*, plat2.btest.*]) FROM plat1.atest, plat2.btest WHERE plat1.atest.id = plat2.btest.id;",
+    "predicted_pql": "SELECT TRAIN(model_name=HELR, label=plat2.btest.y, features=[plat1.atest.*, plat2.btest.*]) FROM plat1.atest, plat2.btest WHERE plat1.atest.id = plat2.btest.id;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在TEE中，查询university_platform平台的enrollment_info表中某个特定学期ID对应的总注册学生人数。",
+    "target_pql": "SET semester_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc005(count(university_platform.enrollment_info.student_id)) FROM university_platform.enrollment_info WHERE university_platform.enrollment_info.semester_id = semester_id",
+    "predicted_pql": "SET semester_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(count(university_platform.enrollment_info.student_id)) FROM university_platform.enrollment_info WHERE university_platform.enrollment_info.semester_id = semester_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "请使用TEE硬件，从ida_userbase平台的t_users_secure表中，查询user_id与param_user_id匹配的用户名和电话号码。",
+    "target_pql": "SELECT ida_userbase.t_users_secure.name, ida_userbase.t_users_secure.phone_number WHERE ida_userbase.t_users_secure.user_id = param_user_id USING TEE;",
+    "predicted_pql": "SELECT ida_userbase.t_users_secure.username, ida_userbase.t_users_secure.phone_number WHERE ida_userbase.t_users_secure.user_id = param_user_id USING TEE;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "利用 TEE 计算 ida_en_one 平台的 delivery_services 表与 ida_en_two 平台的 logistics_info 表中相匹配的包裹跟踪号。",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.delivery_services.tracking_number FROM ida_en_one.delivery_services, ida_en_two.logistics_info WHERE ida_en_one.delivery_services.tracking_number = ida_en_two.logistics_info.tracking_number",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.delivery_services.tracking_number FROM ida_en_one.delivery_services, ida_en_two.logistics_info WHERE ida_en_one.delivery_services.tracking_number = ida_en_two.logistics_info.tracking_number;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "使用TEE硬件，如何安全地统计数据表branchZ的attendance_records中的总行数？",
+    "target_pql": "select /*+ FUNC(TEE) */ count(a = branchZ.attendance_records.id) from branchZ.attendance_records;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ count(a = branchZ.attendance_records.id) from branchZ.attendance_records;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "如何利用硬件TEE查找ida_en_one平台的healthcare_records表与ida_en_two平台的insurance_policies表中重叠的健康保险保单号码？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.healthcare_records.policy_number FROM ida_en_one.healthcare_records, ida_en_two.insurance_policies WHERE ida_en_one.healthcare_records.policy_number = ida_en_two.insurance_policies.policy_number",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.healthcare_records.policy_number FROM ida_en_one.healthcare_records, ida_en_two.insurance_policies WHERE ida_en_one.healthcare_records.policy_number = ida_en_two.insurance_policies.policy_number;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "利用MPC，计算web_metrics平台中old_data表与new_data表的流量增长百分比。",
+    "target_pql": "SELECT (web_metrics.new_data.traffic - web_metrics.old_data.traffic) / web_metrics.old_data.traffic * 100 FROM web_metrics.old_data, web_metrics.new_data WHERE web_metrics.old_data.page_id = web_metrics.new_data.page_id;",
+    "predicted_pql": "SELECT (new_data.visits - old_data.visits) * 100 / old_data.visits FROM web_metrics.old_data, web_metrics.new_data WHERE web_metrics.old_data.date = web_metrics.new_data.date;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "利用HESB联邦预测功能，在plat1的`testing_data`表上，结合由plat2托管的模型（model_id为2023091009380013）进行预测分析。",
+    "target_pql": "SELECT PREDICT(model_name=HESB, model_guest=plat2, model_id=2023091009380013) FROM plat1.testing_data;",
+    "predicted_pql": "SELECT PREDICT(model_name=HESB, model_guest=plat2, model_id=2023091009380013) FROM plat1.testing_data;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "如何利用TEE技术安全地计算test_data_one和test_data_two中的分数中值？",
+    "target_pql": "select /*+ FUNC(TEE) */ medianonly02(key = test_data_one.student_id, a = test_data_one.score, b = test_data_two.score) from test_data_one, test_data_two;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ medianonly02(key = test_data_one.score_id, a = test_data_one.score, b = test_data_two.score) from test_data_one, test_data_two;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "将ida_en_two平台的sales_data表与ida_en_four平台的order_info表通过order_id字段进行关联后，计算其总销售额是多少？",
+    "target_pql": "SELECT SUM(ida_en_two.sales_data.sales_amount) FROM ida_en_two.sales_data, ida_en_four.order_info WHERE ida_en_two.sales_data.order_id = ida_en_four.order_info.order_id",
+    "predicted_pql": "SELECT SUM(ida_en_two.sales_data.total_sales) FROM ida_en_two.sales_data, ida_en_four.order_info WHERE ida_en_two.sales_data.order_id = ida_en_four.order_info.order_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在使用TEE硬件的情况下，如何计算ida_en_one平台中m_enterprise_1w表里，id为t1的行的balance值与t2的总和？",
+    "target_pql": "SET t1 = ?; SET t2 = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc001(ida_en_one.m_enterprise_1w.balance, t2) FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.id = t1",
+    "predicted_pql": "SET t1 = ?; SET t2 = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc001(ida_en_one.m_enterprise_1w.balance, t2) FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.id = t1;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "在安全硬件环境中，如何识别ida_en_one平台的m_products_1w表与ida_en_two平台的m_analysis_1w表中共有的id条目，并提取对应的类别数据？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.m_products_1w.category FROM ida_en_one.m_products_1w, ida_en_two.m_analysis_1w WHERE ida_en_one.m_products_1w.id = ida_en_two.m_analysis_1w.id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.m_products_1w.category FROM ida_en_one.m_products_1w, ida_en_two.m_analysis_1w WHERE ida_en_one.m_products_1w.id = ida_en_two.m_analysis_1w.id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "我们能否通过order_id字段，在ida_order平台的order_details表和ida_invoice平台的invoice_records表中查找重复的订单？",
+    "target_pql": "SELECT ida_order.order_details.order_id FROM ida_order.order_details, ida_invoice.invoice_records WHERE ida_order.order_details.order_id = ida_invoice.invoice_records.order_id",
+    "predicted_pql": "SELECT ida_order.order_details.order_id FROM ida_order.order_details, ida_invoice.invoice_records WHERE ida_order.order_details.order_id = ida_invoice.invoice_records.order_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "在ida_en_one平台上，通过TEE查询m_enterprise_1w表，获取ID为param1的余额和社会ID。",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.balance, ida_en_one.m_enterprise_1w.socialid WHERE ida_en_one.m_enterprise_1w.id = param1 USING TEE;",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.balance, ida_en_one.m_enterprise_1w.socialid WHERE ida_en_one.m_enterprise_1w.id = param1 USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "使用安全TEE从ida_en_billing平台的t_payment_records表中获取与param_record_key对应的加密支付信息。",
+    "target_pql": "SELECT ida_en_billing.t_payment_records.payment_info WHERE ida_en_billing.t_payment_records.record_key = param_record_key USING TEE;",
+    "predicted_pql": "SELECT ida_en_billing.t_payment_records.payment_info WHERE ida_en_billing.t_payment_records.record_key = param_record_key USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "怎样利用TEE硬件安全计算platform_y的store_data和platform_z的store_data的总收入？",
+    "target_pql": "select /*+ FUNC(TEE) */ sumonly02(key = platform_y.store_data.id, a = platform_y.store_data.revenue, b = platform_z.store_data.revenue) from platform_y.store_data, platform_z.store_data;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ sumonly02(key = platform_y.store_data.id, a = platform_y.store_data.revenue, b = platform_z.store_data.revenue) from platform_y.store_data, platform_z.store_data;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在TEE中，查询education_platform平台上exam_results表中按指定学生ID筛选后的平均分数。",
+    "target_pql": "SET student_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(avg(education_platform.exam_results.score)) FROM education_platform.exam_results WHERE education_platform.exam_results.student_id = student_id",
+    "predicted_pql": "SET student_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(avg(education_platform.exam_results.score)) FROM education_platform.exam_results WHERE education_platform.exam_results.student_id = student_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "在使用MPC的情况下，credit_secure平台的user_profiles表中最低的信用评分是多少？",
+    "target_pql": "SELECT MIN(credit_secure.user_profiles.credit_score) FROM credit_secure.user_profiles;",
+    "predicted_pql": "SELECT MIN(credit_secure.user_profiles.credit_score) FROM credit_secure.user_profiles;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "利用TEE硬件，查询sales_platform的sales_inventory表中，地区ID等于输入region时的最低销售价格。",
+    "target_pql": "SET region = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(min(sales_platform.sales_inventory.sale_price)) FROM sales_platform.sales_inventory WHERE sales_platform.sales_inventory.region_id = region",
+    "predicted_pql": "SET region = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(min(sales_platform.sales_inventory.sale_price)) FROM sales_platform.sales_inventory WHERE sales_platform.sales_inventory.region_id = region",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "在TEE中，如何查找manufacturing_platform平台的supplier_list表与procurement_platform平台的vendor_history表中共有的供应商ID？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ manufacturing_platform.supplier_list.vendor_id FROM manufacturing_platform.supplier_list, procurement_platform.vendor_history WHERE manufacturing_platform.supplier_list.vendor_id = procurement_platform.vendor_history.vendor_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ manufacturing_platform.supplier_list.supplier_id FROM manufacturing_platform.supplier_list, procurement_platform.vendor_history WHERE manufacturing_platform.supplier_list.supplier_id = procurement_platform.vendor_history.supplier_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "在ida_en_two平台上，通过TEE硬件查询m_product_transactions表中product_id与param3相匹配的交易日期和产品名称。",
+    "target_pql": "SELECT ida_en_two.m_product_transactions.transaction_date, ida_en_two.m_product_transactions.product_name WHERE ida_en_two.m_product_transactions.product_id = param3 USING TEE;",
+    "predicted_pql": "SELECT ida_en_two.m_product_transactions.transaction_date, ida_en_two.m_product_transactions.product_name WHERE ida_en_two.m_product_transactions.product_id = param3 USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "如何使用TEE确定shop_platform平台中的customer_emails表与email_service平台中的subscriber_emails表之间的共同客户电子邮件地址？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ shop_platform.customer_emails.email FROM shop_platform.customer_emails, email_service.subscriber_emails WHERE shop_platform.customer_emails.email = email_service.subscriber_emails.email",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ shop_platform.customer_emails.email FROM shop_platform.customer_emails, email_service.subscriber_emails WHERE shop_platform.customer_emails.email = email_service.subscriber_emails.email;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "借助TEE硬件，如何安全地计算enterprise_t.business_data表中profits字段的最大值？",
+    "target_pql": "select /*+ FUNC(TEE) */ max(a = enterprise_t.business_data.profits) from enterprise_t.business_data;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ max(a = enterprise_t.business_data.profits) from enterprise_t.business_data;",
+    "correct": true
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在ida_en_one平台的m_enterprise_1w表中，如何统计社交账号的去重数量？",
+    "target_pql": "SELECT COUNT(DISTINCT ida_en_one.m_enterprise_1w.socialid) AS unique_socialids FROM ida_en_one.m_enterprise_1w",
+    "predicted_pql": "SELECT COUNT(DISTINCT ida_en_one.m_enterprise_1w.socialid) AS unique_social_accounts FROM ida_en_one.m_enterprise_1w",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "完成特征工程后，基于plat1.ad_data和plat2.user_behavior数据训练联邦HELR模型，并将user_behavior.click_rate设为目标变量。",
+    "target_pql": "SELECT Sequence(FE(model_name=HESCALE, label=plat2.user_behavior.click_rate, features=[plat1.ad_data.*, plat2.user_behavior.*]), TRAIN(model_name=HELR, label=plat2.user_behavior.click_rate, features=[plat1.ad_data.*, plat2.user_behavior.*])) FROM plat1.ad_data, plat2.user_behavior WHERE plat1.ad_data.ad_id = plat2.user_behavior.ad_id;",
+    "predicted_pql": "SELECT SEQUENCE(FE(model_name=HESCALE, label=plat2.user_behavior.click_rate), TRAIN(model_name=HELR, label=plat2.user_behavior.click_rate)) FROM plat1.ad_data, plat2.user_behavior WHERE plat1.ad_data.ad_id = plat2.user_behavior.ad_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在ida_en_two数据库的company_finance表中，怎样查询公司ID对应的总收入和员工数量？",
+    "target_pql": "SELECT ida_en_two.company_finance.total_revenue, ida_en_two.company_finance.employee_count FROM ida_en_two.company_finance WHERE ida_en_two.company_finance.company_id = $param1",
+    "predicted_pql": "SELECT ida_en_two.company_finance.total_revenue, ida_en_two.company_finance.employee_count FROM ida_en_two.company_finance WHERE ida_en_two.company_finance.company_id = $param1;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "是否可以通过product_id来识别ida_en_two和ida_en_three平台数据集中共享的产品？",
+    "target_pql": "SELECT ida_en_two.product_catalog.product_name FROM ida_en_two.product_catalog, ida_en_three.product_index WHERE ida_en_two.product_catalog.product_id = ida_en_three.product_index.product_id",
+    "predicted_pql": "SELECT ida_en_two.product_sales.product_id FROM ida_en_two.product_sales, ida_en_three.product_reviews WHERE ida_en_two.product_sales.product_id = ida_en_three.product_reviews.product_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "在secure_platform平台的sales_data表中，金额超过1000的销售记录总额是多少？",
+    "target_pql": "SELECT SUM(secure_platform.sales_data.amount) FROM secure_platform.sales_data WHERE secure_platform.sales_data.amount > 1000;",
+    "predicted_pql": "SELECT SUM(secure_platform.sales_data.amount) FROM secure_platform.sales_data WHERE secure_platform.sales_data.amount > 1000;",
+    "correct": true
+  },
+  {
+    "scene": "software_PIR",
+    "question": "请从ida_en_two.m_enterprise_1w表中查询出所有socialid包含'xyz'且余额小于param1的记录。",
+    "target_pql": "SELECT * FROM ida_en_two.m_enterprise_1w WHERE ida_en_two.m_enterprise_1w.socialid LIKE '%xyz%' AND ida_en_two.m_enterprise_1w.balance < $param1",
+    "predicted_pql": "SELECT * FROM ida_en_two.m_enterprise_1w WHERE ida_en_two.m_enterprise_1w.socialid LIKE '%xyz%' AND ida_en_two.m_enterprise_1w.balance < $param1;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "在ida_en_one平台的m_enterprise_1w表与ida_en_two平台的m_security_1w表中，当id字段的值相同时，如何通过安全计算得到balance字段的总和？",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.balance + ida_en_two.m_security_1w.balance FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "predicted_pql": "SELECT SUM(ida_en_one.m_enterprise_1w.balance + ida_en_two.m_security_1w.balance) FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "如何通过TEE从ida_en_vehicle平台的t_registration_list表中查询与param_vehicle_id对应的车辆登记和车主信息？",
+    "target_pql": "SELECT ida_en_vehicle.t_registration_list.registration, ida_en_vehicle.t_registration_list.owner WHERE ida_en_vehicle.t_registration_list.vehicle_id = param_vehicle_id USING TEE;",
+    "predicted_pql": "SELECT ida_en_vehicle.t_registration_list.registration, ida_en_vehicle.t_registration_list.owner WHERE ida_en_vehicle.t_registration_list.vehicle_id = param_vehicle_id USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "如何利用TEE识别出transport_authority平台的driver_records表与car_rental_service平台的rental_agreements表中匹配的驾驶执照？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ transport_authority.driver_records.license_number FROM transport_authority.driver_records, car_rental_service.rental_agreements WHERE transport_authority.driver_records.license_number = car_rental_service.rental_agreements.driver_license_number",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ transport_authority.driver_records.license_number FROM transport_authority.driver_records, car_rental_service.rental_agreements WHERE transport_authority.driver_records.license_number = car_rental_service.rental_agreements.license_number;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "如何从ida_en_nineteen平台的insurance_data表和ida_en_twenty平台的claims_data表中提取共同的policy_numbers？",
+    "target_pql": "SELECT ida_en_nineteen.insurance_data.policy_number FROM ida_en_nineteen.insurance_data, ida_en_twenty.claims_data WHERE ida_en_nineteen.insurance_data.policy_number = ida_en_twenty.claims_data.policy_number",
+    "predicted_pql": "SELECT ida_en_nineteen.insurance_data.policy_number FROM ida_en_nineteen.insurance_data, ida_en_twenty.claims_data WHERE ida_en_nineteen.insurance_data.policy_number = ida_en_twenty.claims_data.policy_number;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "能否通过 `transaction_id` 字段安全地将 ida_en_five 平台的 `transaction_history` 表与 ida_en_six 平台的 `asset_records` 表进行关联？",
+    "target_pql": "SELECT ida_en_five.transaction_history.transaction_id FROM ida_en_five.transaction_history, ida_en_six.asset_records WHERE ida_en_five.transaction_history.transaction_id = ida_en_six.asset_records.transaction_id",
+    "predicted_pql": "SELECT ida_en_five.transaction_history.transaction_id FROM ida_en_five.transaction_history, ida_en_six.asset_records WHERE ida_en_five.transaction_history.transaction_id = ida_en_six.asset_records.transaction_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "如何通过TEE支持的硬件安全计算，得出branch_x和branch_y的shop_data的总销售额？",
+    "target_pql": "select /*+ FUNC(TEE) */ sum(a = branch_x.shop_data.sales, b = branch_y.shop_data.sales) from branch_x.shop_data, branch_y.shop_data;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ sum(a = branch_x.shop_data.sales, b = branch_y.shop_data.sales) from branch_x.shop_data, branch_y.shop_data;",
+    "correct": true
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "如何使用HESB联邦模型对plat1平台的inventory表和plat2平台的sales表进行训练，其中的标签字段为plat2.sales.sales_volume，学习率设置为0.1？",
+    "target_pql": "SELECT TRAIN(model_name=HESB, label=plat2.sales.sales_volume, params=(learning_rate=0.1), features=[plat1.inventory.*, plat2.sales.*]) FROM plat1.inventory, plat2.sales WHERE plat1.inventory.product_id = plat2.sales.product_id;",
+    "predicted_pql": "SELECT TRAIN(model_name=HESB, model_param=(learning_rate=0.1), label=plat2.sales.sales_volume, features=[plat1.inventory.*, plat2.sales.*]) FROM plat1.inventory, plat2.sales WHERE plat1.inventory.product_id = plat2.sales.product_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "在TEE环境中，如何获取ida_en_one平台的payroll表与ida_en_two平台的hr_system表中交叉的员工ID列表？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.payroll.employee_id FROM ida_en_one.payroll, ida_en_two.hr_system WHERE ida_en_one.payroll.employee_id = ida_en_two.hr_system.employee_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.payroll.employee_id FROM ida_en_one.payroll, ida_en_two.hr_system WHERE ida_en_one.payroll.employee_id = ida_en_two.hr_system.employee_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "怎么通过员工ID匹配，查询ida_en_two平台的employees表和ida_en_five平台的staff_info表中都存在的员工？",
+    "target_pql": "SELECT ida_en_two.employees.employee_name FROM ida_en_two.employees, ida_en_five.staff_info WHERE ida_en_two.employees.employee_id = ida_en_five.staff_info.employee_id",
+    "predicted_pql": "SELECT ida_en_two.employees.employee_id FROM ida_en_two.employees, ida_en_five.staff_info WHERE ida_en_two.employees.employee_id = ida_en_five.staff_info.employee_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "在MPC平台中，internet_data库的site_traffic表记录的每日访问者人数的中位数是多少？",
+    "target_pql": "SELECT MEDIAN(internet_data.site_traffic.daily_visitors) FROM internet_data.site_traffic;",
+    "predicted_pql": "SELECT MEDIAN(internet_data.site_traffic.daily_visitors) FROM internet_data.site_traffic;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在TEE环境下，如何计算ida_en_one平台m_enterprise_1w表中id为t1的记录的balance与t2的总和相加？",
+    "target_pql": "SET t1 = ?; SET t2 = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc001(ida_en_one.m_enterprise_1w.balance, t2) FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.id = t1",
+    "predicted_pql": "SET t1 = ?; SET t2 = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc001(ida_en_one.m_enterprise_1w.balance, t2) FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.id = t1",
+    "correct": true
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "使用 plat1 的 health_records 表和 plat2 的 patient_tests 表来训练 HELR 模型，其中标签字段为 plat2.patient_tests.test_result。",
+    "target_pql": "SELECT TRAIN(model_name=HELR, label=plat2.patient_tests.test_result, features=[plat1.health_records.*, plat2.patient_tests.*]) FROM plat1.health_records, plat2.patient_tests WHERE plat1.health_records.patient_id = plat2.patient_tests.patient_id;",
+    "predicted_pql": "SELECT TRAIN(model_name=HELR, label=plat2.patient_tests.test_result, features=[plat1.health_records.*, plat2.patient_tests.*]) FROM plat1.health_records, plat2.patient_tests WHERE plat1.health_records.patient_id = plat2.patient_tests.patient_id;",
+    "correct": true
+  },
+  {
+    "scene": "software_PIR",
+    "question": "如何根据社交账号的后三位对ida_en_two平台的m_enterprise_1w表进行分组，并统计每组的余额总和？",
+    "target_pql": "SELECT RIGHT(ida_en_two.m_enterprise_1w.socialid, 3) AS suffix, SUM(ida_en_two.m_enterprise_1w.balance) AS total_balance FROM ida_en_two.m_enterprise_1w GROUP BY suffix",
+    "predicted_pql": "SELECT SUM(ida_en_two.m_enterprise_1w.balance) FROM ida_en_two.m_enterprise_1w GROUP BY ida_en_two.m_enterprise_1w.socialid[-3:]",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "如何通过item_code识别ida_retail平台的stock_data表与ida_supplier平台的supply_records表中的共同产品ID？",
+    "target_pql": "SELECT ida_retail.stock_data.item_code FROM ida_retail.stock_data, ida_supplier.supply_records WHERE ida_retail.stock_data.item_code = ida_supplier.supply_records.item_code",
+    "predicted_pql": "SELECT ida_retail.stock_data.item_code FROM ida_retail.stock_data, ida_supplier.supply_records WHERE ida_retail.stock_data.item_code = ida_supplier.supply_records.item_code;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "使用TEE系统，在finance_system平台中查询payroll表中收入高于特定工资的员工人数。",
+    "target_pql": "SET certain_salary = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(count(finance_system.payroll.employee_id)) FROM finance_system.payroll WHERE finance_system.payroll.salary > certain_salary",
+    "predicted_pql": "SET salary_threshold = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(count(finance_system.payroll.employee_id)) FROM finance_system.payroll WHERE finance_system.payroll.salary > salary_threshold;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "使用安全计算，计算出ida_en_one平台的m_enterprise_1w表与ida_en_two平台的m_security_1w表中，id相同的行对应balance字段乘积的平均值。",
+    "target_pql": "SELECT AVG(ida_en_one.m_enterprise_1w.balance * ida_en_two.m_security_1w.balance) FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "predicted_pql": "SELECT AVG(ida_en_one.m_enterprise_1w.balance * ida_en_two.m_security_1w.balance) FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "请在ida_en_two平台上，使用TEE从m_market_data表中提取market_id与param17相等的市场份额以及合作伙伴名称。",
+    "target_pql": "SELECT ida_en_two.m_market_data.market_share, ida_en_two.m_market_data.partner_name WHERE ida_en_two.m_market_data.market_id = param17 USING TEE;",
+    "predicted_pql": "SELECT ida_en_two.m_market_data.market_share, ida_en_two.m_market_data.partner_name WHERE ida_en_two.m_market_data.market_id = param17 USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "software_PSI",
+    "question": "如何通过`id`字段查询`m_enterprise_1w`表和`m_security_1w`表中用户数据（如姓名和余额）的交集？",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.name, ida_en_one.m_enterprise_1w.balance, ida_en_two.m_security_1w.name, ida_en_two.m_security_1w.balance FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.name, ida_en_one.m_enterprise_1w.balance, ida_en_two.m_security_1w.name, ida_en_two.m_security_1w.balance FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在TEE环境中，从education_platform平台的student_scores表中查询与指定课程ID对应的最高分。",
+    "target_pql": "SET course_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc009(max(education_platform.student_scores.score)) FROM education_platform.student_scores WHERE education_platform.student_scores.course_id = course_id",
+    "predicted_pql": "SET course_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(max(education_platform.student_scores.score)) FROM education_platform.student_scores WHERE education_platform.student_scores.course_id = course_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "如何利用TEE硬件从ida_en_seven平台的m_health_records表中提取与param_pid对应的患者编号的健康记录？",
+    "target_pql": "SELECT ida_en_seven.m_health_records.records WHERE ida_en_seven.m_health_records.patient_id = param_pid USING TEE;",
+    "predicted_pql": "SELECT ida_en_seven.m_health_records.health_records WHERE ida_en_seven.m_health_records.patient_id = param_pid USING TEE;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "怎样通过TEE硬件计算finance_corp和insurance_corp表中customer_base客户的跨公司总人数？",
+    "target_pql": "select /*+ FUNC(TEE) */ count(a = finance_corp.customer_base.id, b = insurance_corp.customer_base.id) from finance_corp.customer_base, insurance_corp.customer_base;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ sumonly02(key = finance_corp.customer_base.customer_id, a = finance_corp.customer_base.count, b = insurance_corp.customer_base.count) from finance_corp.customer_base, insurance_corp.customer_base;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "如何通过安全计算获取ida_en_one平台的m_enterprise_1w表与ida_en_two平台的m_security_1w表中，在id匹配的情况下，balance字段乘积的最大值？",
+    "target_pql": "SELECT MAX(ida_en_one.m_enterprise_1w.balance * ida_en_two.m_security_1w.balance) FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "predicted_pql": "SELECT MAX(ida_en_one.m_enterprise_1w.balance * ida_en_two.m_security_1w.balance) FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "correct": true
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "基于plat1的教育数据（educational_data）和plat2的考试分数（exam_scores），完成HELR模型的预测任务。",
+    "target_pql": "SELECT PREDICT(model_name=HELR, model_guest=plat2.exam_scores, model_id=202303310505050505) FROM plat1.educational_data, plat2.exam_scores WHERE plat1.educational_data.student_id = plat2.exam_scores.student_id;",
+    "predicted_pql": "SELECT PREDICT(model_name=HELR, model_guest=plat2.exam_scores, model_id=202303231004509428758, guest_id=2) FROM plat1.educational_data, plat2.exam_scores WHERE plat1.educational_data.student_id = plat2.exam_scores.student_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在 ida_en_one 平台的 m_financial_transactions 表中，账户 ID 与 param1 相匹配的交易共有多少？",
+    "target_pql": "SELECT COUNT(*) FROM ida_en_one.m_financial_transactions WHERE ida_en_one.m_financial_transactions.account_id = $param1",
+    "predicted_pql": "SELECT COUNT(*) FROM ida_en_one.m_financial_transactions WHERE ida_en_one.m_financial_transactions.account_id = $param1;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "如何评估使用plat1的交易数据（transaction_data）和plat2的产品数据（product_data）训练的HELR模型，其中目标标签为plat2.transaction_data.purchased？",
+    "target_pql": "SELECT SEQUENCE(TRAIN(model_name=HELR, label=plat2.transaction_data.purchased, features=[plat1.transaction_data.*, plat2.product_data.*]), EVAL(default_eval_setting=binary)) FROM plat1.transaction_data, plat2.product_data WHERE plat1.transaction_data.transaction_id = plat2.product_data.transaction_id;",
+    "predicted_pql": "SELECT Sequence(TRAIN(model_name=HELR, label=plat2.transaction_data.purchased, features=[plat1.transaction_data.*, plat2.product_data.*]), EVAL(default_eval_setting=binary)) FROM plat1.transaction_data, plat2.product_data WHERE plat1.transaction_data.transaction_id = plat2.product_data.transaction_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在使用TEE硬件的情况下，将ida_en_one平台中m_enterprise_1w表里id等于t1的那一行的balance字段与t2进行相加。",
+    "target_pql": "SET t1 = ?; SET t2 = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc001(ida_en_one.m_enterprise_1w.balance, t2) FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.id = t1",
+    "predicted_pql": "SET t1 = ?; SET t2 = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc001(ida_en_one.m_enterprise_1w.balance, t2) FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.id = t1;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "对plat1的transaction_data和plat2的user_profile进行特征工程，并以plat2.user_profile.rating作为标签，训练HELR模型。",
+    "target_pql": "SELECT SEQUENCE(FE(model_name=HESCALE, label=plat2.user_profile.rating), TRAIN(model_name=HELR, label=plat2.user_profile.rating)) FROM plat1.transaction_data, plat2.user_profile WHERE plat1.transaction_data.user_id = plat2.user_profile.user_id;",
+    "predicted_pql": "SELECT Sequence(FE(model_name=HESCALE,label=plat2.user_profile.rating), TRAIN(model_name=HELR,label=plat2.user_profile.rating)) FROM plat1.transaction_data, plat2.user_profile WHERE plat1.transaction_data.user_id = plat2.user_profile.user_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在ida_en_one平台的student_courses表中，如何通过学生ID查询对应的报名日期和课程名称？",
+    "target_pql": "SELECT ida_en_one.student_courses.enrollment_date, ida_en_one.student_courses.course_name FROM ida_en_one.student_courses WHERE ida_en_one.student_courses.student_id = $param1",
+    "predicted_pql": "SELECT ida_en_one.student_courses.enrollment_date, ida_en_one.student_courses.course_name FROM ida_en_one.student_courses WHERE ida_en_one.student_courses.student_id = $param1;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "在plat1的atest表和plat2的btest表中，使用HELR联邦学习进行训练，训练的标签字段为plat2.btest.y。",
+    "target_pql": "SELECT TRAIN(model_name=HELR, label=plat2.btest.y, features=[plat1.atest.*, plat2.btest.*]) FROM plat1.atest, plat2.btest WHERE plat1.atest.id = plat2.btest.id;",
+    "predicted_pql": "SELECT TRAIN(model_name=HELR, label=plat2.btest.y, features=[plat1.atest.*, plat2.btest.*]) FROM plat1.atest, plat2.btest WHERE plat1.atest.id = plat2.btest.id;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "在使用TEE时，如何找出municipal_platform平台的traffic_fines表与legal_platform平台的parking_tickets表中车牌号的交集？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ municipal_platform.traffic_fines.plate_number FROM municipal_platform.traffic_fines, legal_platform.parking_tickets WHERE municipal_platform.traffic_fines.plate_number = legal_platform.parking_tickets.plate_number",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ municipal_platform.traffic_fines.license_plate FROM municipal_platform.traffic_fines, legal_platform.parking_tickets WHERE municipal_platform.traffic_fines.license_plate = legal_platform.parking_tickets.license_plate;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "哪些用户的社会ID同时在m_enterprise_1w表和m_security_1w表中出现？",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.socialid, ida_en_one.m_enterprise_1w.name, ida_en_two.m_security_1w.socialid, ida_en_two.m_security_1w.name FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.socialid = ida_en_two.m_security_1w.socialid",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.social_id FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.social_id = ida_en_two.m_security_1w.social_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "如何使用TEE计算employment_platform平台中compensation表的所有奖金总和，其中部门ID字段与参数dep匹配。",
+    "target_pql": "SET dep = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(sum(employment_platform.compensation.bonus)) FROM employment_platform.compensation WHERE employment_platform.compensation.department_id = dep",
+    "predicted_pql": "SET dep = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(sum(employment_platform.compensation.bonus)) FROM employment_platform.compensation WHERE employment_platform.compensation.department_id = dep;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在ida_en_two的warehouse_stock表中，如何通过产品ID查询对应的SKU和库存数量？",
+    "target_pql": "SELECT ida_en_two.warehouse_stock.sku, ida_en_two.warehouse_stock.stock_quantity FROM ida_en_two.warehouse_stock WHERE ida_en_two.warehouse_stock.product_id = $param1",
+    "predicted_pql": "SELECT ida_en_two.warehouse_stock.sku, ida_en_two.warehouse_stock.quantity FROM ida_en_two.warehouse_stock WHERE ida_en_two.warehouse_stock.product_id = $param1;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "ida_en_six平台的payment_details表与ida_en_seven平台的payment_reports表中，哪些交易的reference_id是相同的？",
+    "target_pql": "SELECT ida_en_six.payment_details.transaction_amount FROM ida_en_six.payment_details, ida_en_seven.payment_reports WHERE ida_en_six.payment_details.reference_id = ida_en_seven.payment_reports.reference_id",
+    "predicted_pql": "SELECT ida_en_six.payment_details.reference_id FROM ida_en_six.payment_details, ida_en_seven.payment_reports WHERE ida_en_six.payment_details.reference_id = ida_en_seven.payment_reports.reference_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "如何使用MPC计算出finance_secure平台中bank_transactions表内所有存款金额大于1000的总和？",
+    "target_pql": "SELECT SUM(finance_secure.bank_transactions.deposit) FROM finance_secure.bank_transactions WHERE finance_secure.bank_transactions.deposit > 1000;",
+    "predicted_pql": "SELECT SUM(finance_secure.bank_transactions.deposit_amount) FROM finance_secure.bank_transactions WHERE finance_secure.bank_transactions.deposit_amount > 1000;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "借助TEE硬件，计算auto_records平台的vehicle_registry表中车型为model_name的车辆的平均里程。",
+    "target_pql": "SET model_name = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc014(avg(auto_records.vehicle_registry.mileage)) FROM auto_records.vehicle_registry WHERE auto_records.vehicle_registry.model = model_name",
+    "predicted_pql": "SET model_name = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(avg(auto_records.vehicle_registry.mileage)) FROM auto_records.vehicle_registry WHERE auto_records.vehicle_registry.model = model_name;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "如何安全地获取ida_en_twentyseven平台的subscriptions表与ida_en_twentyeight平台的billing_data表中共有的subscription_ids？",
+    "target_pql": "SELECT ida_en_twentyseven.subscriptions.subscription_id FROM ida_en_twentyseven.subscriptions, ida_en_twentyeight.billing_data WHERE ida_en_twentyseven.subscriptions.subscription_id = ida_en_twentyeight.billing_data.subscription_id",
+    "predicted_pql": "SELECT ida_en_twentyseven.subscriptions.subscription_id FROM ida_en_twentyseven.subscriptions, ida_en_twentyeight.billing_data WHERE ida_en_twentyseven.subscriptions.subscription_id = ida_en_twentyeight.billing_data.subscription_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "请找出ida_en_seven平台的user_base表与ida_en_eight平台的contact_list表中共有的电子邮件地址。",
+    "target_pql": "SELECT ida_en_seven.user_base.email FROM ida_en_seven.user_base, ida_en_eight.contact_list WHERE ida_en_seven.user_base.email = ida_en_eight.contact_list.email",
+    "predicted_pql": "SELECT ida_en_seven.user_base.email FROM ida_en_seven.user_base, ida_en_eight.contact_list WHERE ida_en_seven.user_base.email = ida_en_eight.contact_list.email;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "使用TEE硬件，查询sales_platform平台中sales_data表里类别字段与变量cat相匹配的销售总额。",
+    "target_pql": "SET cat = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(sum(sales_platform.sales_data.sales_amount)) FROM sales_platform.sales_data WHERE sales_platform.sales_data.category = cat",
+    "predicted_pql": "SET cat = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(sum(sales_platform.sales_data.sales_amount)) FROM sales_platform.sales_data WHERE sales_platform.sales_data.category = cat;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "如何利用 `employee_id` 字段，将 `ida_hr_system` 平台的 `t_employee_info` 表与 `ida_org_platform` 平台的 `t_department_staff` 表进行关联，从而实现联合员工记录分析？",
+    "target_pql": "SELECT ida_hr_system.t_employee_info.employee_id FROM ida_hr_system.t_employee_info, ida_org_platform.t_department_staff WHERE ida_hr_system.t_employee_info.employee_id = ida_org_platform.t_department_staff.employee_id",
+    "predicted_pql": "SELECT ida_hr_system.t_employee_info.employee_id FROM ida_hr_system.t_employee_info, ida_org_platform.t_department_staff WHERE ida_hr_system.t_employee_info.employee_id = ida_org_platform.t_department_staff.employee_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在受TEE保护的环境中，如何计算education_db平台中student_info表内特定class_id班级学生身高的标准差？",
+    "target_pql": "SET class_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc008(stddev(education_db.student_info.height)) FROM education_db.student_info WHERE education_db.student_info.class = class_id",
+    "predicted_pql": "SET class_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc005(stddev(education_db.student_info.height)) FROM education_db.student_info WHERE education_db.student_info.class_id = class_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在ida_en_one.m_enterprise_1w表中，统计满足id与param1匹配且socialid等于'S123'的行数。",
+    "target_pql": "SELECT COUNT(*) FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.id = $param1 AND ida_en_one.m_enterprise_1w.socialid = 'S123'",
+    "predicted_pql": "SELECT COUNT(*) FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.id = $param1 AND ida_en_one.m_enterprise_1w.socialid = 'S123'",
+    "correct": true
+  },
+  {
+    "scene": "software_MPC",
+    "question": "在TEE环境下，利用MPC计算retail_data平台中store_one表和store_two表的store_id相匹配时的monthly_sales字段乘积。",
+    "target_pql": "SELECT retail_data.store_one.store_id, retail_data.store_one.monthly_sales * retail_data.store_two.monthly_sales FROM retail_data.store_one, retail_data.store_two WHERE retail_data.store_one.store_id = retail_data.store_two.store_id;",
+    "predicted_pql": "SELECT retail_data.store_one.store_id, retail_data.store_one.monthly_sales * retail_data.store_two.monthly_sales FROM retail_data.store_one, retail_data.store_two WHERE retail_data.store_one.store_id = retail_data.store_two.store_id;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "借助TEE硬件计算，查询inventory_platform平台中products表内，供货商ID字段等于输入参数supplier时的最高商品价格。",
+    "target_pql": "SET supplier = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(max(inventory_platform.products.price)) FROM inventory_platform.products WHERE inventory_platform.products.supplier_id = supplier",
+    "predicted_pql": "SET supplier = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(max(inventory_platform.products.price)) FROM inventory_platform.products WHERE inventory_platform.products.supplier_id = supplier;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "在使用TEE硬件时，怎样才能安全地查询platform_x的sales_data表中的最高销售额？",
+    "target_pql": "select /*+ FUNC(TEE) */ max(a = platform_x.sales_data.sales_amount) from platform_x.sales_data;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ max(a = platform_x.sales_data.sales_amount) from platform_x.sales_data;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "在ida_en_one平台上，通过安全计算查询m_enterprise_1w表中ID为param1的余额和社会ID。",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.balance, ida_en_one.m_enterprise_1w.socialid WHERE ida_en_one.m_enterprise_1w.id = param1 USING TEE;",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.balance, ida_en_one.m_enterprise_1w.socialid WHERE ida_en_one.m_enterprise_1w.id = param1 USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "在TEE环境中，如何查询出warehouse_1和warehouse_2的inventory表中共有的产品ID？",
+    "target_pql": "select /*+ FUNC(TEE) */ intersect(a = warehouse_1.inventory.product_id, b = warehouse_2.inventory.product_id) from warehouse_1.inventory, warehouse_2.inventory;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ intersect(a = warehouse_1.inventory.product_id, b = warehouse_2.inventory.product_id) from warehouse_1.inventory, warehouse_2.inventory;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "如何通过TEE从ida_en_eighteen平台的m_bank_statements表中获取与param_account_num对应的账户号码的银行结算单？",
+    "target_pql": "SELECT ida_en_eighteen.m_bank_statements.statement WHERE ida_en_eighteen.m_bank_statements.account_number = param_account_num USING TEE;",
+    "predicted_pql": "SELECT ida_en_eighteen.m_bank_statements.statement WHERE ida_en_eighteen.m_bank_statements.account_number = param_account_num USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "如何利用TEE硬件，通过user_id安全关联ida_en_one平台的purchase_history表与ida_en_two平台的promotion_tracker表，并查询匹配的交易日期？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.purchase_history.transaction_date FROM ida_en_one.purchase_history, ida_en_two.promotion_tracker WHERE ida_en_one.purchase_history.user_id = ida_en_two.promotion_tracker.user_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.purchase_history.transaction_date FROM ida_en_one.purchase_history, ida_en_two.promotion_tracker WHERE ida_en_one.purchase_history.user_id = ida_en_two.promotion_tracker.user_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "如何通过TEE硬件查找ida_en_one平台的m_payments_1w表与ida_en_two平台的m_orders_1w表中共同的customer_id，并提取对应的交易金额？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.m_payments_1w.amount FROM ida_en_one.m_payments_1w, ida_en_two.m_orders_1w WHERE ida_en_one.m_payments_1w.customer_id = ida_en_two.m_orders_1w.customer_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.m_payments_1w.transaction_amount FROM ida_en_one.m_payments_1w, ida_en_two.m_orders_1w WHERE ida_en_one.m_payments_1w.customer_id = ida_en_two.m_orders_1w.customer_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "在TEE环境中，如何列出ida_trade_monitor平台的t_shared_companies表与ida_sector_db平台的t_enlisted_corporates表中公司ID相匹配的记录？",
+    "target_pql": "SELECT ida_trade_monitor.t_shared_companies.company_id FROM ida_trade_monitor.t_shared_companies, ida_sector_db.t_enlisted_corporates WHERE ida_trade_monitor.t_shared_companies.company_id = ida_sector_db.t_enlisted_corporates.company_id",
+    "predicted_pql": "SELECT ida_trade_monitor.t_shared_companies.company_id FROM ida_trade_monitor.t_shared_companies, ida_sector_db.t_enlisted_corporates WHERE ida_trade_monitor.t_shared_companies.company_id = ida_sector_db.t_enlisted_corporates.company_id;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "如何使用HELR模型对plat1.activity_log进行联邦预测，其中模型来源于plat2 (model_id: 20250315)？",
+    "target_pql": "SELECT PREDICT(model_name=HELR, model_guest=plat2, model_id=20250315) FROM plat1.activity_log;",
+    "predicted_pql": "SELECT PREDICT(model_name=HELR, model_guest=plat2, model_id=20250315) FROM plat1.activity_log;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "在ida_en_two平台上，通过硬件TEE查找m_account_info表中account_number与param13匹配的账户类型和账户余额。",
+    "target_pql": "SELECT ida_en_two.m_account_info.account_type, ida_en_two.m_account_info.account_balance WHERE ida_en_two.m_account_info.account_number = param13 USING TEE;",
+    "predicted_pql": "SELECT ida_en_two.m_account_info.account_type, ida_en_two.m_account_info.account_balance WHERE ida_en_two.m_account_info.account_number = param13 USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "software_MPC",
+    "question": "当ida_en_one平台的m_enterprise_1w表中的id与ida_en_two平台的m_security_1w表中的id相匹配时，使用安全计算对balance字段进行相除操作。",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.balance / ida_en_two.m_security_1w.balance FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.balance / ida_en_two.m_security_1w.balance FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "在ida_en_two平台上，使用TEE查询m_project_info表中与param9对应的team_id相关的项目截止日期和经理姓名。",
+    "target_pql": "SELECT ida_en_two.m_project_info.project_deadline, ida_en_two.m_project_info.manager_name WHERE ida_en_two.m_project_info.team_id = param9 USING TEE;",
+    "predicted_pql": "SELECT ida_en_two.m_project_info.project_deadline, ida_en_two.m_project_info.manager_name WHERE ida_en_two.m_project_info.team_id = param9 USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在ida_en_one平台的m_enterprise_1w表中，如何查询余额低于指定数值的用户社交账号？",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.socialid FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.balance < $param1",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.socialid FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.balance < $param1",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "如何利用TEE从ida_en_ten平台的m_loan_accounts表中查询与param_account字段匹配的账户编号对应的贷款信息？",
+    "target_pql": "SELECT ida_en_ten.m_loan_accounts.loan_info WHERE ida_en_ten.m_loan_accounts.account_id = param_account USING TEE;",
+    "predicted_pql": "SELECT ida_en_ten.m_loan_accounts.loan_details WHERE ida_en_ten.m_loan_accounts.account_number = param_account USING TEE;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "在 private_platform 平台的 sales_data 表中，统计各个地区的收入总和。",
+    "target_pql": "SELECT secure_platform.sales_data.region, SUM(secure_platform.sales_data.revenue) FROM secure_platform.sales_data GROUP BY secure_platform.sales_data.region;",
+    "predicted_pql": "SELECT platform.private_platform.sales_data.region, SUM(platform.private_platform.sales_data.revenue) FROM platform.private_platform.sales_data GROUP BY platform.private_platform.sales_data.region;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "在硬件TEE环境中，如何获取ida_en_one平台的contacts表中与ida_en_two平台的directory表匹配的电话号码？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.contacts.phone_number FROM ida_en_one.contacts, ida_en_two.directory WHERE ida_en_one.contacts.phone_number = ida_en_two.directory.phone_number",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.contacts.phone_number FROM ida_en_one.contacts, ida_en_two.directory WHERE ida_en_one.contacts.phone_number = ida_en_two.directory.phone_number;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在TEE设置中，如何计算ecommerce_db平台中product_sales表内符合category_id条件的产品总收入？",
+    "target_pql": "SET category_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc013(sum(ecommerce_db.product_sales.revenue)) FROM ecommerce_db.product_sales WHERE ecommerce_db.product_sales.category = category_id",
+    "predicted_pql": "SET category_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(sum(ecommerce_db.product_sales.revenue)) FROM ecommerce_db.product_sales WHERE ecommerce_db.product_sales.category_id = category_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "如何通过安全TEE，从ida_en_airlines平台的m_flight_schedule表中查询与param_flight_code匹配的航班号和起飞时间？",
+    "target_pql": "SELECT ida_en_airlines.m_flight_schedule.flight_number, ida_en_airlines.m_flight_schedule.departure_time WHERE ida_en_airlines.m_flight_schedule.flight_code = param_flight_code USING TEE;",
+    "predicted_pql": "SELECT ida_en_airlines.m_flight_schedule.flight_number, ida_en_airlines.m_flight_schedule.departure_time WHERE ida_en_airlines.m_flight_schedule.flight_code = param_flight_code USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "如何通过TEE确定company_HR平台中的employee_records表与social_system平台中的government_social_security表之间重叠的社会保障号码？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ company_HR.employee_records.ssn FROM company_HR.employee_records, social_system.government_social_security WHERE company_HR.employee_records.ssn = social_system.government_social_security.ssn",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ company_HR.employee_records.social_security_number FROM company_HR.employee_records, social_system.government_social_security WHERE company_HR.employee_records.social_security_number = social_system.government_social_security.social_security_number;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "如何利用TEE技术，在ida_en_one平台的employee_records_1w表和ida_en_two平台的security_data_1w表中，基于emp_id字段实现隐私保护连接，并查询它们对应的角色信息？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.employee_records_1w.role FROM ida_en_one.employee_records_1w, ida_en_two.security_data_1w WHERE ida_en_one.employee_records_1w.emp_id = ida_en_two.security_data_1w.emp_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ ida_en_one.employee_records_1w.role FROM ida_en_one.employee_records_1w, ida_en_two.security_data_1w WHERE ida_en_one.employee_records_1w.emp_id = ida_en_two.security_data_1w.emp_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "使用MPC，比较ida_persona平台中demographics表的age字段与ida_births平台根据birth_year计算出的年龄之间的差异。",
+    "target_pql": "SELECT ida_persona.demographics.id, ida_persona.demographics.age - (YEAR(CURDATE()) - ida_births.birth_year) FROM ida_persona.demographics, ida_births WHERE ida_persona.demographics.id = ida_births.id;",
+    "predicted_pql": "SELECT AVG(demographics.age - (YEAR(CURDATE()) - ida_births.birth_year)) FROM ida_persona.demographics, ida_births WHERE ida_persona.demographics.person_id = ida_births.person_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "在环境TEE中，通过id_card_no字段进行匹配，查询ida_employee_mgmt平台的t_staff_list表和ida_security_guild平台的t_access_tracks表中所有员工姓名的交集。",
+    "target_pql": "SELECT ida_employee_mgmt.t_staff_list.staff_name FROM ida_employee_mgmt.t_staff_list, ida_security_guild.t_access_tracks WHERE ida_employee_mgmt.t_staff_list.id_card_no = ida_security_guild.t_access_tracks.id_card_no",
+    "predicted_pql": "SELECT ida_employee_mgmt.t_staff_list.first_name, ida_employee_mgmt.t_staff_list.last_name FROM ida_employee_mgmt.t_staff_list, ida_security_guild.t_access_tracks WHERE ida_employee_mgmt.t_staff_list.id_card_no = ida_security_guild.t_access_tracks.id_card_no;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "在plat1和plat2平台上的atest表和btest表中，使用HESB进行模型训练，并将btest表中的y字段作为标签，同时设置自定义参数。",
+    "target_pql": "SELECT TRAIN(model_name=HESB, label=plat2.btest.y, params=(num_trees=3,max_depth=3,learning_rate=0.2)) FROM plat1.atest, plat2.btest WHERE plat1.atest.id = plat2.btest.id;",
+    "predicted_pql": "SELECT TRAIN(model_name=HESB, label=plat2.btest.y, params=(alpha=0.5, n_estimators=100)) FROM plat1.atest, plat2.btest WHERE plat1.atest.id = plat2.btest.id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在TEE环境中，如何查询financial_platform平台的transaction_log表中某个指定账户ID的交易总数？",
+    "target_pql": "SET account_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc005(count(financial_platform.transaction_log.transaction_id)) FROM financial_platform.transaction_log WHERE financial_platform.transaction_log.account_id = account_id",
+    "predicted_pql": "SET account_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(count(financial_platform.transaction_log.transaction_id)) FROM financial_platform.transaction_log WHERE financial_platform.transaction_log.account_id = account_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "在TEE中，如何获取employment_platform平台的job_board表与hr_platform平台的application_records表之间的职位ID的交集？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ employment_platform.job_board.job_id FROM employment_platform.job_board, hr_platform.application_records WHERE employment_platform.job_board.job_id = hr_platform.application_records.job_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ employment_platform.job_board.position_id FROM employment_platform.job_board, hr_platform.application_records WHERE employment_platform.job_board.position_id = hr_platform.application_records.position_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "如何在hr_secure平台的employment_data表中计算出不包含实习生的员工平均任期？",
+    "target_pql": "SELECT AVG(secure_platform.employment_data.tenure) FROM secure_platform.employment_data WHERE secure_platform.employment_data.position != 'Intern';",
+    "predicted_pql": "SELECT AVG(hr_secure.employment_data.length_of_service) FROM hr_secure.employment_data WHERE hr_secure.employment_data.employee_type != 'Intern';",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "ida_en_one.m_employees表中，分部为param4的唯一职位是什么？",
+    "target_pql": "SELECT DISTINCT ida_en_one.m_employees.job_title FROM ida_en_one.m_employees WHERE ida_en_one.m_employees.division = $param4",
+    "predicted_pql": "SELECT DISTINCT ida_en_one.m_employees.position FROM ida_en_one.m_employees WHERE ida_en_one.m_employees.department = $param4;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "以 `socialid` 作为关联字段，验证 `ida_en_one` 和 `ida_en_two` 中条目的交集。",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.socialid, ida_en_two.m_security_1w.socialid FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.socialid = ida_en_two.m_security_1w.socialid",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.socialid FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.socialid = ida_en_two.m_security_1w.socialid;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "在 ida_en_twelve 平台上使用 TEE，从 m_feedback_data 表中获取客户编号为 param_feedback_id 的反馈数据。",
+    "target_pql": "SELECT ida_en_twelve.m_feedback_data.feedback WHERE ida_en_twelve.m_feedback_data.customer_id = param_feedback_id USING TEE;",
+    "predicted_pql": "SELECT ida_en_twelve.m_feedback_data.feedback, ida_en_twelve.m_feedback_data.rating WHERE ida_en_twelve.m_feedback_data.customer_id = param_feedback_id USING TEE;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在ida_en_one平台的m_feedback_1w表中，如何查询feedback_id与param20匹配的反馈评分和评论？",
+    "target_pql": "SELECT ida_en_one.m_feedback_1w.feedback_score, ida_en_one.m_feedback_1w.comments FROM ida_en_one.m_feedback_1w WHERE ida_en_one.m_feedback_1w.feedback_id = $param20",
+    "predicted_pql": "SELECT ida_en_one.m_feedback_1w.rating, ida_en_one.m_feedback_1w.comments FROM ida_en_one.m_feedback_1w WHERE ida_en_one.m_feedback_1w.feedback_id = $param20;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "如何通过TEE安全计算ida_en_one平台的project_assignments_1w表与ida_en_two平台的project_updates_1w表中的共享项目ID，并提取对应的更新备注？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ ida_en_two.project_updates_1w.update_notes FROM ida_en_one.project_assignments_1w, ida_en_two.project_updates_1w WHERE ida_en_one.project_assignments_1w.project_id = ida_en_two.project_updates_1w.project_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ ida_en_two.project_updates_1w.comments FROM ida_en_one.project_assignments_1w, ida_en_two.project_updates_1w WHERE ida_en_one.project_assignments_1w.project_id = ida_en_two.project_updates_1w.project_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "如何通过TEE识别airline_system平台的flight_bookings表与rewards_network平台的loyalty_program表中重复的常旅客号码？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ airline_system.flight_bookings.ff_number FROM airline_system.flight_bookings, rewards_network.loyalty_program WHERE airline_system.flight_bookings.ff_number = rewards_network.loyalty_program.member_number",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ airline_system.flight_bookings.customer_number FROM airline_system.flight_bookings, rewards_network.loyalty_program WHERE airline_system.flight_bookings.customer_number = rewards_network.loyalty_program.customer_number;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "在HELR联邦学习模型中，以plat1的sales_data表和plat2的customer_info表作为训练数据，其中plat2.customer_info.purchase作为标签，两个表中的所有字段作为特征。",
+    "target_pql": "SELECT TRAIN(model_name=HELR, label=plat2.customer_info.purchase, features=[plat1.sales_data.*, plat2.customer_info.*]) FROM plat1.sales_data, plat2.customer_info WHERE plat1.sales_data.customer_id = plat2.customer_info.customer_id;",
+    "predicted_pql": "SELECT TRAIN(model_name=HELR, label=plat2.customer_info.purchase, features=[plat1.sales_data.*, plat2.customer_info.*]) FROM plat1.sales_data, plat2.customer_info WHERE plat1.sales_data.customer_id = plat2.customer_info.customer_id;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "如何通过TEE从ida_en_four平台的m_transaction_logs表中提取与param_tid匹配的交易详情？",
+    "target_pql": "SELECT ida_en_four.m_transaction_logs.transaction_details WHERE ida_en_four.m_transaction_logs.transaction_id = param_tid USING TEE;",
+    "predicted_pql": "SELECT ida_en_four.m_transaction_logs.transaction_details WHERE ida_en_four.m_transaction_logs.transaction_id = param_tid USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "software_PSI",
+    "question": "如何通过customer_id查询ida_sales平台的sales_records表和ida_pay平台的payment_history表，计算用户的总购买金额？",
+    "target_pql": "SELECT ida_sales.sales_records.total_purchase FROM ida_sales.sales_records, ida_pay.payment_history WHERE ida_sales.sales_records.customer_id = ida_pay.payment_history.customer_id",
+    "predicted_pql": "SELECT ida_sales.sales_records.total_purchase_amount FROM ida_sales.sales_records, ida_pay.payment_history WHERE ida_sales.sales_records.customer_id = ida_pay.payment_history.customer_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "在ida_en_one环境中，通过TEE查询m_vehicle_registry表中，vehicle_id等于param20时的注册日期和车辆型号。",
+    "target_pql": "SELECT ida_en_one.m_vehicle_registry.registration_date, ida_en_one.m_vehicle_registry.vehicle_model WHERE ida_en_one.m_vehicle_registry.vehicle_id = param20 USING TEE;",
+    "predicted_pql": "SELECT ida_en_one.m_vehicle_registry.registration_date, ida_en_one.m_vehicle_registry.vehicle_model WHERE ida_en_one.m_vehicle_registry.vehicle_id = param20 USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "software_PSI",
+    "question": "在通过`patient_id`字段进行匹配时，`ida_medical_platform`平台的`t_patient_records`表与`ida_healthcare_provider`平台的`t_visits`表中有哪些重复的记录及对应的ID？",
+    "target_pql": "SELECT ida_medical_platform.t_patient_records.patient_id FROM ida_medical_platform.t_patient_records, ida_healthcare_provider.t_visits WHERE ida_medical_platform.t_patient_records.patient_id = ida_healthcare_provider.t_visits.patient_id",
+    "predicted_pql": "SELECT ida_medical_platform.t_patient_records.patient_id FROM ida_medical_platform.t_patient_records, ida_healthcare_provider.t_visits WHERE ida_medical_platform.t_patient_records.patient_id = ida_healthcare_provider.t_visits.patient_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "在通过 `product_id` 字段进行匹配时，`ida_supplier_data` 平台的 `t_products` 表与 `ida_retail_data` 平台的 `t_inventory` 表中共有哪些相同的商品 ID？",
+    "target_pql": "SELECT ida_supplier_data.t_products.product_id FROM ida_supplier_data.t_products, ida_retail_data.t_inventory WHERE ida_supplier_data.t_products.product_id = ida_retail_data.t_inventory.product_id",
+    "predicted_pql": "SELECT ida_supplier_data.t_products.product_id FROM ida_supplier_data.t_products, ida_retail_data.t_inventory WHERE ida_supplier_data.t_products.product_id = ida_retail_data.t_inventory.product_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "在TEE中，如何识别出courier_platform平台的delivery_orders表与storage_platform平台的warehouse_inventory表中重复的包裹ID？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ courier_platform.delivery_orders.parcel_id FROM courier_platform.delivery_orders, storage_platform.warehouse_inventory WHERE courier_platform.delivery_orders.parcel_id = storage_platform.warehouse_inventory.parcel_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ courier_platform.delivery_orders.package_id FROM courier_platform.delivery_orders, storage_platform.warehouse_inventory WHERE courier_platform.delivery_orders.package_id = storage_platform.warehouse_inventory.package_id;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "如何使用plat23和plat24平台的transactions表，以customer_id作为主键字段，训练HELR模型来预测平均订单价值？",
+    "target_pql": "SELECT TRAIN(model_name=HELR, label=plat23.transactions.avg_order_value, features=[plat23.transactions.*, plat24.transactions.*]) FROM plat23.transactions, plat24.transactions WHERE plat23.transactions.customer_id = plat24.transactions.customer_id;",
+    "predicted_pql": "SELECT TRAIN(model_name=HELR, label=plat24.transactions.avg_order_value, features=[plat23.transactions.*, plat24.transactions.*]) FROM plat23.transactions, plat24.transactions WHERE plat23.transactions.customer_id = plat24.transactions.customer_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "如何使用TEE安全查询平台ida_en_one的m_enterprise_1w表中，ID与param1匹配的余额及社会ID？",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.balance, ida_en_one.m_enterprise_1w.socialid WHERE ida_en_one.m_enterprise_1w.id = param1 USING TEE;",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.balance, ida_en_one.m_enterprise_1w.socialid WHERE ida_en_one.m_enterprise_1w.id = param1 USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在ida_en_two数据库的iot_devices表中，如何根据设备ID查询设备类型和最后的活动时间戳？",
+    "target_pql": "SELECT ida_en_two.iot_devices.device_type, ida_en_two.iot_devices.last_activity FROM ida_en_two.iot_devices WHERE ida_en_two.iot_devices.device_id = $param1",
+    "predicted_pql": "SELECT ida_en_two.iot_devices.device_type, ida_en_two.iot_devices.last_activity FROM ida_en_two.iot_devices WHERE ida_en_two.iot_devices.device_id = $param1;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "在匹配`registration_id`字段时，`ida_corp_registry`平台的`t_company_data`表与`ida_corp_risk_monitor`平台的`t_audit_logs`表中，存在哪些重复的公司注册号？",
+    "target_pql": "SELECT ida_corp_registry.t_company_data.registration_id FROM ida_corp_registry.t_company_data, ida_corp_risk_monitor.t_audit_logs WHERE ida_corp_registry.t_company_data.registration_id = ida_corp_risk_monitor.t_audit_logs.registration_id",
+    "predicted_pql": "SELECT ida_corp_registry.t_company_data.registration_id FROM ida_corp_registry.t_company_data, ida_corp_risk_monitor.t_audit_logs WHERE ida_corp_registry.t_company_data.registration_id = ida_corp_risk_monitor.t_audit_logs.registration_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "请列出ida_en_one.m_enterprise_1w表中余额介于500到param1之间的所有id。",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.id FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.balance BETWEEN 500 AND $param1",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.id FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.balance BETWEEN 500 AND $param1",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "如何通过安全TEE从ida_en_projects平台的t_project_contractors表中查询与param_contractor_num匹配的承包商详细信息及相关项目代码？",
+    "target_pql": "SELECT ida_en_projects.t_project_contractors.details, ida_en_projects.t_project_contractors.project_code WHERE ida_en_projects.t_project_contractors.contractor_num = param_contractor_num USING TEE;",
+    "predicted_pql": "SELECT ida_en_projects.t_project_contractors.contractor_details, ida_en_projects.t_project_contractors.project_code WHERE ida_en_projects.t_project_contractors.contractor_num = param_contractor_num USING TEE;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "在使用TEE硬件的情况下，如何安全地计算出asset_one和asset_two记录中的净资产？",
+    "target_pql": "select /*+ FUNC(TEE) */ sumonly02(key = asset_one.asset_id, a = asset_one.value, b = asset_two.value) from asset_one, asset_two;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ sumonly02(key = asset_one.id, a = asset_one.net_worth, b = asset_two.net_worth) from asset_one, asset_two;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "如何计算ida_en_twentythree平台的project_management表与ida_en_twentyfour平台的resources表中project_codes字段的重叠情况？",
+    "target_pql": "SELECT ida_en_twentythree.project_management.project_code FROM ida_en_twentythree.project_management, ida_en_twentyfour.resources WHERE ida_en_twentythree.project_management.project_code = ida_en_twentyfour.resources.project_code",
+    "predicted_pql": "SELECT ida_en_twentythree.project_management.project_code FROM ida_en_twentythree.project_management, ida_en_twentyfour.resources WHERE ida_en_twentythree.project_management.project_code = ida_en_twentyfour.resources.project_code;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "在使用id字段的前提下，ida_en_one平台的m_enterprise_1w表和ida_en_two平台的m_security_1w表中同时存在的记录具有什么相同的属性？",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.id, ida_en_two.m_security_1w.id, ida_en_one.m_enterprise_1w.balance, ida_en_two.m_security_1w.balance, ida_en_one.m_enterprise_1w.name, ida_en_two.m_security_1w.name, ida_en_one.m_enterprise_1w.adress, ida_en_two.m_security_1w.adress, ida_en_one.m_enterprise_1w.phone, ida_en_two.m_security_1w.phone, ida_en_one.m_enterprise_1w.purpose, ida_en_two.m_security_1w.purpose, ida_en_one.m_enterprise_1w.time, ida_en_two.m_security_1w.time, ida_en_one.m_enterprise_1w.remarks, ida_en_two.m_security_1w.remarks, ida_en_one.m_enterprise_1w.socialid, ida_en_two.m_security_1w.socialid FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id",
+    "predicted_pql": "SELECT ida_en_one.m_enterprise_1w.id FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "是否可以通过 `travel_id` 字段，在 `ida_trip` 平台的 `itinerary` 表与 `ida_tour` 平台的 `booking_log` 表之间执行旅行 ID 的隐私求交操作？",
+    "target_pql": "SELECT ida_trip.itinerary.travel_id FROM ida_trip.itinerary, ida_tour.booking_log WHERE ida_trip.itinerary.travel_id = ida_tour.booking_log.travel_id",
+    "predicted_pql": "SELECT ida_trip.itinerary.travel_id FROM ida_trip.itinerary, ida_tour.booking_log WHERE ida_trip.itinerary.travel_id = ida_tour.booking_log.travel_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "在MPC中，如何计算demographics_data平台中demographics_details表的年龄字段与收入字段之间的相关性？",
+    "target_pql": "SELECT CORR(demographics_data.demographics_details.age, demographics_data.demographics_details.income) FROM demographics_data.demographics_details;",
+    "predicted_pql": "SELECT CORR(demographics_data.demographics_details.age, demographics_data.demographics_details.income) FROM demographics_data.demographics_details;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "如何使用TEE计算financial_inst数据库中payments表的最大交易金额？",
+    "target_pql": "select /*+ FUNC(TEE) */ max(a = financial_inst.payments.amount) from financial_inst.payments;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ max(a = financial_inst.payments.amount) from financial_inst.payments;",
+    "correct": true
+  },
+  {
+    "scene": "software_MPC",
+    "question": "使用MPC计算data_analysis平台中user_growth表的用户数量指数增长率。",
+    "target_pql": "SELECT EXP(GROWTH_RATE(data_analysis.user_growth.users)) FROM data_analysis.user_growth;",
+    "predicted_pql": "SELECT EXP(GROWTH_RATE(data_analysis.user_growth.user_count)) FROM data_analysis.user_growth;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "在TEE环境中，确认firm_project平台的project_details表与university_research平台的research_codes表中共有的项目代码。",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ firm_project.project_details.project_code FROM firm_project.project_details, university_research.research_codes WHERE firm_project.project_details.project_code = university_research.research_codes.code",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ firm_project.project_details.project_code FROM firm_project.project_details, university_research.research_codes WHERE firm_project.project_details.project_code = university_research.research_codes.project_code;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在TEE硬件环境下，如何计算hr_records平台中emp_data表内部门字段等于变量dep的员工平均薪资？",
+    "target_pql": "SET dep = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(avg(hr_records.emp_data.salary)) FROM hr_records.emp_data WHERE hr_records.emp_data.department = dep",
+    "predicted_pql": "SET dep = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc005(avg(hr_records.emp_data.salary)) FROM hr_records.emp_data WHERE hr_records.emp_data.department = dep;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "在 supply_secure 网络中的 stock_levels 表中，各个项目的最低库存数量是多少？",
+    "target_pql": "SELECT secure_platform.stock_levels.item_id, MIN(secure_platform.stock_levels.stock_quantity) FROM secure_platform.stock_levels GROUP BY secure_platform.stock_levels.item_id;",
+    "predicted_pql": "SELECT product_id, MIN(stock_levels.quantity) FROM supply_secure.stock_levels GROUP BY product_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "使用TEE，找出fitness_platform平台的gym_members表与events_platform平台的event_attendees表中共有的会员ID。",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ fitness_platform.gym_members.membership_id FROM fitness_platform.gym_members, events_platform.event_attendees WHERE fitness_platform.gym_members.membership_id = events_platform.event_attendees.membership_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ fitness_platform.gym_members.member_id FROM fitness_platform.gym_members, events_platform.event_attendees WHERE fitness_platform.gym_members.member_id = events_platform.event_attendees.member_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "借助TEE硬件，从exploration_platform平台的mountain_records表中查找变量peak对应的最高海拔值。",
+    "target_pql": "SET peak = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc020(max(exploration_platform.mountain_records.altitude)) FROM exploration_platform.mountain_records WHERE exploration_platform.mountain_records.peak_id = peak",
+    "predicted_pql": "SET peak = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(max(exploration_platform.mountain_records.altitude)) FROM exploration_platform.mountain_records WHERE exploration_platform.mountain_records.peak_id = peak;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "如何利用TEE硬件安全地计算policy_one和policy_two中的保险费？",
+    "target_pql": "select /*+ FUNC(TEE) */ sumonly02(key = policy_one.policy_id, a = policy_one.premium, b = policy_two.premium) from policy_one, policy_two;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ sumonly02(key = policy_one.policy_id, a = policy_one.insurance_fee, b = policy_two.insurance_fee) from policy_one, policy_two;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "在TEE环境中，确认education_platform平台中的university_registry表与network_platform平台中的alumni_data表之间共有的学生ID。",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ education_platform.university_registry.student_id FROM education_platform.university_registry, network_platform.alumni_data WHERE education_platform.university_registry.student_id = network_platform.alumni_data.student_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ education_platform.university_registry.student_id FROM education_platform.university_registry, network_platform.alumni_data WHERE education_platform.university_registry.student_id = network_platform.alumni_data.student_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在TEE保护环境下，统计digital_platform平台的user_base表中某指定月份mon_var的新注册用户总数。",
+    "target_pql": "SET mon_var = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc018(count(digital_platform.user_base.user_id)) FROM digital_platform.user_base WHERE digital_platform.user_base.registration_month = mon_var",
+    "predicted_pql": "SET mon_var = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(count(digital_platform.user_base.register_date)) FROM digital_platform.user_base WHERE digital_platform.user_base.registration_month = mon_var;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "对plat1的在线活动数据（online_activity）和plat2的交易数据（transaction_data）进行特征工程，并以plat2.transaction_data.is_fraudulent作为目标变量，开展HESB模型训练。",
+    "target_pql": "SELECT SEQUENCE(FE(model_name=HESCALE, label=plat2.transaction_data.is_fraudulent, features=[plat1.online_activity.*, plat2.transaction_data.*]), TRAIN(model_name=HESB, label=plat2.transaction_data.is_fraudulent)) FROM plat1.online_activity, plat2.transaction_data WHERE plat1.online_activity.user_id = plat2.transaction_data.user_id;",
+    "predicted_pql": "SELECT SEQUENCE(FE(model_name=HESCALE, label=plat2.transaction_data.is_fraudulent, features=[plat1.online_activity.*, plat2.transaction_data.*]), TRAIN(model_name=HESB, label=plat2.transaction_data.is_fraudulent)) FROM plat1.online_activity, plat2.transaction_data WHERE plat1.online_activity.user_id = plat2.transaction_data.user_id;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "如何在TEE硬件中计算出finance_platform平台的transaction_records表中，剔除交易日期等于指定参数transaction_date的交易记录后的交易数量？",
+    "target_pql": "SET transaction_date = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(count(finance_platform.transaction_records.transaction_id)) FROM finance_platform.transaction_records WHERE finance_platform.transaction_records.transaction_date = transaction_date",
+    "predicted_pql": "SET transaction_date = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(count(finance_platform.transaction_records.transaction_id)) FROM finance_platform.transaction_records WHERE finance_platform.transaction_records.transaction_date != transaction_date;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "使用TEE从ida_en_products平台的t_product_catalog表中查询与param_catalog_num对应的产品名称和类别。",
+    "target_pql": "SELECT ida_en_products.t_product_catalog.product_name, ida_en_products.t_product_catalog.category WHERE ida_en_products.t_product_catalog.catalog_num = param_catalog_num USING TEE;",
+    "predicted_pql": "SELECT ida_en_products.t_product_catalog.product_name, ida_en_products.t_product_catalog.category WHERE ida_en_products.t_product_catalog.catalog_number = param_catalog_num USING TEE;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "在TEE硬件安全计算platform_s中，如何计算employee_data表内所有工程师的工资标准差？",
+    "target_pql": "select /*+ FUNC(TEE) */ stddev(a = platform_s.employee_data.salary) from platform_s.employee_data where platform_s.employee_data.role = 'Engineer';",
+    "predicted_pql": "select /*+ FUNC(TEE) */ stddev(a = platform_s.employee_data.salary) from platform_s.employee_data where platform_s.employee_data.role = 'engineer';",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "在ida_en_five平台的transaction_log表和ida_en_seven平台的tx_history表中，基于transaction_code字段，两者共有的交易记录有哪些？",
+    "target_pql": "SELECT ida_en_five.transaction_log.transaction_detail FROM ida_en_five.transaction_log, ida_en_seven.tx_history WHERE ida_en_five.transaction_log.transaction_code = ida_en_seven.tx_history.transaction_code",
+    "predicted_pql": "SELECT ida_en_five.transaction_log.transaction_code FROM ida_en_five.transaction_log, ida_en_seven.tx_history WHERE ida_en_five.transaction_log.transaction_code = ida_en_seven.tx_history.transaction_code;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "在通过 `department_id` 字段关联 `ida_sales_1` 平台的 `t_sales_data` 表与 `ida_org_struct` 平台的 `t_department_info` 表时，如何统计每个部门的总销售额？",
+    "target_pql": "SELECT ida_sales_1.t_sales_data.department_id, SUM(ida_sales_1.t_sales_data.sales_amount) FROM ida_sales_1.t_sales_data, ida_org_struct.t_department_info WHERE ida_sales_1.t_sales_data.department_id = ida_org_struct.t_department_info.department_id GROUP BY ida_sales_1.t_sales_data.department_id",
+    "predicted_pql": "SELECT ida_sales_1.t_sales_data.department_id, SUM(ida_sales_1.t_sales_data.sales_amount) FROM ida_sales_1.t_sales_data, ida_org_struct.t_department_info WHERE ida_sales_1.t_sales_data.department_id = ida_org_struct.t_department_info.department_id GROUP BY ida_sales_1.t_sales_data.department_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PSI",
+    "question": "在ida_en_two平台上，通过id字段定位，m_enterprise_1w表和m_security_1w表中有哪些客户记录是交集的？",
+    "target_pql": "SELECT ida_en_one.m_enterprise_1w.id, ida_en_two.m_security_1w.id, ida_en_one.m_enterprise_1w.name FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id",
+    "predicted_pql": "SELECT ida_en_two.m_enterprise_1w.id FROM ida_en_two.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_two.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "ida_en_one平台中，m_finance_1w表内部门代码与param12相同的部门总开支是多少？",
+    "target_pql": "SELECT SUM(ida_en_one.m_finance_1w.expenses) FROM ida_en_one.m_finance_1w WHERE ida_en_one.m_finance_1w.department_code = $param12",
+    "predicted_pql": "SELECT SUM(ida_en_one.m_finance_1w.expense) FROM ida_en_one.m_finance_1w WHERE ida_en_one.m_finance_1w.department_code = $param12;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "在TEE操作过程中，如何查找corporate_platform平台的ongoing_projects表与financial_platform平台的investor_reports表中共有的项目ID？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ corporate_platform.ongoing_projects.project_id FROM corporate_platform.ongoing_projects, financial_platform.investor_reports WHERE corporate_platform.ongoing_projects.project_id = financial_platform.investor_reports.project_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ corporate_platform.ongoing_projects.project_id FROM corporate_platform.ongoing_projects, financial_platform.investor_reports WHERE corporate_platform.ongoing_projects.project_id = financial_platform.investor_reports.project_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "通过MPC，分析id_spend_platform平台中的marketing_spend字段与id_sales_platform平台中的sales_growth字段之间的相关性。",
+    "target_pql": "SELECT CORR(id_spend_platform.marketing_spend, id_sales_platform.sales_growth) FROM id_spend_platform, id_sales_platform WHERE id_spend_platform.campaign_id = id_sales_platform.campaign_id;",
+    "predicted_pql": "SELECT CORR(id_spend_platform.marketing_spend, id_sales_platform.sales_growth) FROM id_spend_platform, id_sales_platform WHERE id_spend_platform.id = id_sales_platform.id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "在一个TEE中，针对ecommerce_platform平台的orders表和logistics_platform平台的shipment_details表，求两者订单号的交集。",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ ecommerce_platform.orders.order_number FROM ecommerce_platform.orders, logistics_platform.shipment_details WHERE ecommerce_platform.orders.order_number = logistics_platform.shipment_details.order_number",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ ecommerce_platform.orders.order_id FROM ecommerce_platform.orders, logistics_platform.shipment_details WHERE ecommerce_platform.orders.order_id = logistics_platform.shipment_details.order_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "怎样通过TEE硬件计算branch_a库中employee_list表里工资超过2000的员工数量？",
+    "target_pql": "select /*+ FUNC(TEE) */ count(a = branch_a.employee_list.id) from branch_a.employee_list where branch_a.employee_list.salary > 2000;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ count(a = branch_a.employee_list.id) from branch_a.employee_list where branch_a.employee_list.salary > 2000;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在TEE硬件环境下，针对ida_en_one平台的m_enterprise_1w表中，id为t1的记录，将其balance字段与t2进行相加。",
+    "target_pql": "SET t1 = ?; SET t2 = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc001(ida_en_one.m_enterprise_1w.balance, t2) FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.id = t1",
+    "predicted_pql": "SET t1 = ?; SET t2 = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc001(ida_en_one.m_enterprise_1w.balance, t2) FROM ida_en_one.m_enterprise_1w WHERE ida_en_one.m_enterprise_1w.id = t1",
+    "correct": true
+  },
+  {
+    "scene": "software_MPC",
+    "question": "如何通过安全计算，查询ida_en_one平台的m_enterprise_1w表与ida_en_two平台的m_security_1w表中，当id字段匹配时，balance字段乘积的最小值？",
+    "target_pql": "SELECT MIN(ida_en_one.m_enterprise_1w.balance * ida_en_two.m_security_1w.balance) FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "predicted_pql": "SELECT MIN(ida_en_one.m_enterprise_1w.balance * ida_en_two.m_security_1w.balance) FROM ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w WHERE ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "如何利用TEE硬件计算出legal_firm_one的contracts_db与legal_firm_two的agreements_data中重叠的合同ID？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ legal_firm_one.contracts_db.contract_id FROM legal_firm_one.contracts_db, legal_firm_two.agreements_data WHERE legal_firm_one.contracts_db.contract_id = legal_firm_two.agreements_data.contract_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ legal_firm_one.contracts_db.contract_id FROM legal_firm_one.contracts_db, legal_firm_two.agreements_data WHERE legal_firm_one.contracts_db.contract_id = legal_firm_two.agreements_data.contract_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "如何使用TEE安全计算sector_1中bonus_list表中类型为'annual'的奖金总和？",
+    "target_pql": "select /*+ FUNC(TEE) */ sum(a = sector_1.bonus_list.bonus) from sector_1.bonus_list where sector_1.bonus_list.type = 'annual';",
+    "predicted_pql": "select /*+ FUNC(TEE) */ sum(a = sector_1.bonus_list.amount) from sector_1.bonus_list where sector_1.bonus_list.type = 'annual';",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "请统计ida_en_two.m_enterprise_1w表中余额字段等于param1的行中，不同socialid值的数量。",
+    "target_pql": "SELECT COUNT(DISTINCT ida_en_two.m_enterprise_1w.socialid) FROM ida_en_two.m_enterprise_1w WHERE ida_en_two.m_enterprise_1w.balance = $param1",
+    "predicted_pql": "SELECT COUNT(DISTINCT ida_en_two.m_enterprise_1w.socialid) FROM ida_en_two.m_enterprise_1w WHERE ida_en_two.m_enterprise_1w.balance = $param1;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "怎么利用TEE硬件安全地计算platform_one的customer_table和platform_two的customer_table中客户ID的交集？",
+    "target_pql": "select /*+ FUNC(TEE) */ joinonly02(key_a = platform_one.customer_table.id, key_b = platform_two.customer_table.id) from platform_one.customer_table, platform_two.customer_table;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ intersect(a = platform_one.customer_table.customer_id, b = platform_two.customer_table.customer_id) from platform_one.customer_table, platform_two.customer_table;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "如何利用TEE技术，从ida_factory_mgmt平台的product_inspections表中查询与param_product_id对应的故障率和生产日期？",
+    "target_pql": "SELECT ida_factory_mgmt.product_inspections.failure_rate, ida_factory_mgmt.product_inspections.manufacturing_date WHERE ida_factory_mgmt.product_inspections.product_id = param_product_id USING TEE;",
+    "predicted_pql": "SELECT ida_factory_mgmt.product_inspections.failure_rate, ida_factory_mgmt.product_inspections.production_date WHERE ida_factory_mgmt.product_inspections.product_id = param_product_id USING TEE;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "请从 ida_en_one 平台的 m_supplier_info 表中查询国家与 param8 相匹配的供应商名称及其联系方式。",
+    "target_pql": "SELECT ida_en_one.m_supplier_info.supplier_name, ida_en_one.m_supplier_info.contact_details FROM ida_en_one.m_supplier_info WHERE ida_en_one.m_supplier_info.country = $param8",
+    "predicted_pql": "SELECT ida_en_one.m_supplier_info.supplier_name, ida_en_one.m_supplier_info.contact_info FROM ida_en_one.m_supplier_info WHERE ida_en_one.m_supplier_info.country = $param8;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "在使用HEL联邦学习进行模型训练时，数据来源分别是plat1的checkups表和plat2的diagnosis_data表，其中标签字段为plat2.diagnosis_data.condition_severity。",
+    "target_pql": "SELECT TRAIN(model_name=HELR, label=plat2.diagnosis_data.condition_severity, features=[plat1.checkups.*, plat2.diagnosis_data.*]) FROM plat1.checkups, plat2.diagnosis_data WHERE plat1.checkups.patient_id = plat2.diagnosis_data.patient_id;",
+    "predicted_pql": "SELECT TRAIN(model_name=HEL, label=plat2.diagnosis_data.condition_severity, features=[plat1.checkups.*, plat2.diagnosis_data.*]) FROM plat1.checkups, plat2.diagnosis_data WHERE plat1.checkups.patient_id = plat2.diagnosis_data.patient_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "借助TEE硬件，如何统计school_data表中district_1区域的学生总数？",
+    "target_pql": "select /*+ FUNC(TEE) */ count(a = district_1.school_data.student_id) from district_1.school_data;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ count(a = school_data.student_id) from school_data where school_data.district = 'district_1';",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "根据模型ID为202412345678和feedback_id，对plat27的order_data表与plat28的customer_feedback表进行产品需求的联邦预测。",
+    "target_pql": "SELECT PREDICT(model_name=HESB, model_guest=plat28.customer_feedback, model_id=202412345678) FROM plat27.order_data, plat28.customer_feedback WHERE plat27.order_data.feedback_id = plat28.customer_feedback.feedback_id;",
+    "predicted_pql": "SELECT PREDICT(model_name=HESB, model_guest=plat28.customer_feedback, model_id=202412345678, model_guest_id_col=plat28.customer_feedback.feedback_id) FROM plat27.order_data, plat28.customer_feedback WHERE plat27.order_data.order_id = plat28.customer_feedback.order_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在ida_en_one平台的m_orders_1w表中，查询order_id等于param6时对应的最大订单金额。",
+    "target_pql": "SELECT MAX(ida_en_one.m_orders_1w.order_value) FROM ida_en_one.m_orders_1w WHERE ida_en_one.m_orders_1w.order_id = $param6",
+    "predicted_pql": "SELECT MAX(ida_en_one.m_orders_1w.order_amount) FROM ida_en_one.m_orders_1w WHERE ida_en_one.m_orders_1w.order_id = $param6;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "利用TEE硬件，从library_system平台的reading_log表中查询与书本ID对应的已读页数总和。",
+    "target_pql": "SET book = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc019(sum(library_system.reading_log.pages_read)) FROM library_system.reading_log WHERE library_system.reading_log.book_id = book",
+    "predicted_pql": "SET book_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(sum(library_system.reading_log.read_pages)) FROM library_system.reading_log WHERE library_system.reading_log.book_id = book_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "在TEE安全计算中，怎样确定factory_A和factory_B的supply_chain中共同的供应商ID？",
+    "target_pql": "select /*+ FUNC(TEE) */ intersect(a = factory_A.supply_chain.supplier_id, b = factory_B.supply_chain.supplier_id) from factory_A.supply_chain, factory_B.supply_chain;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ intersect(a = factory_A.supply_chain.supplier_id, b = factory_B.supply_chain.supplier_id) from factory_A.supply_chain, factory_B.supply_chain;",
+    "correct": true
+  },
+  {
+    "scene": "software_MPC",
+    "question": "secure_discount平台的discounts表中提供的最低折扣是多少？",
+    "target_pql": "SELECT MIN(secure_platform.discounts.discount_value) FROM secure_platform.discounts;",
+    "predicted_pql": "SELECT MIN(secure_platform.discounts.discount) FROM secure_platform.discounts;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "如何利用TEE计算出orders_platform中的orders_data表中，订单金额超过指定order_value的订单总数？",
+    "target_pql": "SET order_value = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(count(orders_platform.orders_data.order_id)) FROM orders_platform.orders_data WHERE orders_platform.orders_data.order_value > order_value",
+    "predicted_pql": "SET order_value = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(count(orders_platform.orders_data.order_id)) FROM orders_platform.orders_data WHERE orders_platform.orders_data.order_amount > order_value;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "如何通过安全计算查询ida_en_one平台中m_enterprise_1w表的balance字段的总和、最大值以及平均值？",
+    "target_pql": "SELECT COUNT(ida_en_one.m_enterprise_1w.balance), MAX(ida_en_one.m_enterprise_1w.balance), AVG(ida_en_one.m_enterprise_1w.balance) FROM ida_en_one.m_enterprise_1w;",
+    "predicted_pql": "SELECT SUM(ida_en_one.m_enterprise_1w.balance), MAX(ida_en_one.m_enterprise_1w.balance), AVG(ida_en_one.m_enterprise_1w.balance) FROM ida_en_one.m_enterprise_1w;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "利用TEE安全计算功能，查询social_media_platform平台的user_accounts表和marketing_platform平台的newsletter_subs表中共同的邮箱地址。",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ social_media_platform.user_accounts.email FROM social_media_platform.user_accounts, marketing_platform.newsletter_subs WHERE social_media_platform.user_accounts.email = marketing_platform.newsletter_subs.email",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ social_media_platform.user_accounts.email FROM social_media_platform.user_accounts, marketing_platform.newsletter_subs WHERE social_media_platform.user_accounts.email = marketing_platform.newsletter_subs.email;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "是否可以通过MPC从commerce_core平台的sales_log表中识别出不同的product_id？",
+    "target_pql": "SELECT COUNT(DISTINCT commerce_core.sales_log.product_id) FROM commerce_core.sales_log;",
+    "predicted_pql": "SELECT COUNT(DISTINCT commerce_core.sales_log.product_id) FROM commerce_core.sales_log;",
+    "correct": true
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "基于plat1的医疗记录数据表（medical_records）和plat2的保险理赔数据表（insurance_claims），以plat2.insurance_claims.approved作为标签，训练并评估一个HELR模型。",
+    "target_pql": "SELECT SEQUENCE(TRAIN(model_name=HELR, label=plat2.insurance_claims.approved, features=[plat1.medical_records.*, plat2.insurance_claims.*]), EVAL(default_eval_setting=binary)) FROM plat1.medical_records, plat2.insurance_claims WHERE plat1.medical_records.record_id = plat2.insurance_claims.record_id;",
+    "predicted_pql": "SELECT SEQUENCE(TRAIN(model_name=HELR, label=plat2.insurance_claims.approved, features=[plat1.medical_records.*, plat2.insurance_claims.*]), EVAL(default_eval_setting=binary)) FROM plat1.medical_records, plat2.insurance_claims WHERE plat1.medical_records.patient_id = plat2.insurance_claims.patient_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "如何通过TEE硬件安全地计算ida_en_one平台的m_enterprise_1w表与ida_en_two平台的m_security_1w表中id字段值的乘积？",
+    "target_pql": "select /*+ FUNC(TEE) */ mulonly02(key = ida_en_one.m_enterprise_1w.id, a = ida_en_one.m_enterprise_1w.id, b = ida_en_two.m_security_1w.id) from ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ mulonly02(key = ida_en_one.m_enterprise_1w.id, a = ida_en_one.m_enterprise_1w.id, b = ida_en_two.m_security_1w.id) from ida_en_one.m_enterprise_1w, ida_en_two.m_security_1w where ida_en_one.m_enterprise_1w.id = ida_en_two.m_security_1w.id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "请从ida_en_one平台的m_order_details表中查询所有交付状态为“pending”的ID和状态。",
+    "target_pql": "SELECT ida_en_one.m_order_details.order_id, ida_en_one.m_order_details.status FROM ida_en_one.m_order_details WHERE ida_en_one.m_order_details.delivery_status = 'pending'",
+    "predicted_pql": "SELECT ida_en_one.m_order_details.order_id, ida_en_one.m_order_details.status FROM ida_en_one.m_order_details WHERE ida_en_one.m_order_details.delivery_status = 'pending'",
+    "correct": true
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "如何利用TEE硬件，在data_platform_x的student_performance表中安全地计算grades字段和weighted_scores字段的乘积？",
+    "target_pql": "select /*+ FUNC(TEE) */ mul(a = data_platform_x.student_performance.grades, b = data_platform_x.student_performance.weighted_scores) from data_platform_x.student_performance;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ mulonly02(key = data_platform_x.student_performance.id, a = data_platform_x.student_performance.grades, b = data_platform_x.student_performance.weighted_scores) from data_platform_x.student_performance;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "借助TEE硬件，如何安全地计算出bank_1的transactions表中排除标记为'test'的交易后的总金额？",
+    "target_pql": "select /*+ FUNC(TEE) */ sum(a = bank_1.transactions.amount) from bank_1.transactions where bank_1.transactions.type != 'test';",
+    "predicted_pql": "select /*+ FUNC(TEE) */ sum(a = bank_1.transactions.amount) from bank_1.transactions where bank_1.transactions.type != 'test';",
+    "correct": true
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在ida_en_two平台的m_budget_plans表中，统计状态为“active”的计划的总支出是多少？",
+    "target_pql": "SELECT SUM(ida_en_two.m_budget_plans.expense) FROM ida_en_two.m_budget_plans WHERE ida_en_two.m_budget_plans.status = 'active'",
+    "predicted_pql": "SELECT SUM(ida_en_two.m_budget_plans.spending) FROM ida_en_two.m_budget_plans WHERE ida_en_two.m_budget_plans.status = 'active'",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "在TEE环境中，如何确认`accounting_one`表的`billing_records`字段中的发票号码与`accounting_two`表的`invoice_data`字段相匹配？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ accounting_one.billing_records.invoice_number FROM accounting_one.billing_records, accounting_two.invoice_data WHERE accounting_one.billing_records.invoice_number = accounting_two.invoice_data.invoice_number",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ accounting_one.billing_records.invoice_number FROM accounting_one.billing_records, accounting_two.invoice_data WHERE accounting_one.billing_records.invoice_number = accounting_two.invoice_data.invoice_number;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "利用TEE硬件，查询env_monitor平台中climate_data表里指定城市标识符city_id的最高温度记录。",
+    "target_pql": "SET city_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc004(max(env_monitor.climate_data.temperature)) FROM env_monitor.climate_data WHERE env_monitor.climate_data.city_id = city_id",
+    "predicted_pql": "SET city_id = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(max(env_monitor.climate_data.temperature)) FROM env_monitor.climate_data WHERE env_monitor.climate_data.city_id = city_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "如何通过TEE计算找出warehouse_A的inventory_data与warehouse_B的asset_records中共有的资产标签？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ warehouse_A.inventory_data.asset_tag FROM warehouse_A.inventory_data, warehouse_B.asset_records WHERE warehouse_A.inventory_data.asset_tag = warehouse_B.asset_records.asset_tag",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ warehouse_A.inventory_data.asset_label FROM warehouse_A.inventory_data, warehouse_B.asset_records WHERE warehouse_A.inventory_data.asset_label = warehouse_B.asset_records.asset_label;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "使用TEE从ida_en_nine平台的m_insurance_policy表中查询与param_policy_num对应的保单编号的保险政策详情。",
+    "target_pql": "SELECT ida_en_nine.m_insurance_policy.policy_details WHERE ida_en_nine.m_insurance_policy.policy_number = param_policy_num USING TEE;",
+    "predicted_pql": "SELECT ida_en_nine.m_insurance_policy.policy_details WHERE ida_en_nine.m_insurance_policy.policy_number = param_policy_num USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "在ida_en_five平台上使用TEE，查询m_vehicle_registry表中与param_oid相匹配的车主编号所对应的车辆注册信息。",
+    "target_pql": "SELECT ida_en_five.m_vehicle_registry.registration_number WHERE ida_en_five.m_vehicle_registry.owner_id = param_oid USING TEE;",
+    "predicted_pql": "SELECT ida_en_five.m_vehicle_registry.vehicle_registration_details WHERE ida_en_five.m_vehicle_registry.owner_id = param_oid USING TEE;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "如何使用TEE计算network_A和network_B中web_portal的独立访问者数量？",
+    "target_pql": "select /*+ FUNC(TEE) */ count(distinct a = network_A.web_portal.visitor_id, b = network_B.web_portal.visitor_id) from network_A.web_portal, network_B.web_portal;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ count(distinct a = network_A.web_portal.visitor_id, b = network_B.web_portal.visitor_id) from network_A.web_portal, network_B.web_portal;",
+    "correct": true
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "如何进行特征工程，并基于plat1的financial_statements和plat2的audit_results数据训练HELR模型，其中标签字段为plat2.audit_results.risk_rating？",
+    "target_pql": "SELECT SEQUENCE(FE(model_name=HESCALE, label=plat2.audit_results.risk_rating), TRAIN(model_name=HELR, label=plat2.audit_results.risk_rating)) FROM plat1.financial_statements, plat2.audit_results WHERE plat1.financial_statements.company_id = plat2.audit_results.company_id;",
+    "predicted_pql": "SELECT SEQUENCE(FE(model_name=HESCALE, label=plat2.audit_results.risk_rating), TRAIN(model_name=HELR, label=plat2.audit_results.risk_rating)) FROM plat1.financial_statements, plat2.audit_results WHERE plat1.financial_statements.company_id = plat2.audit_results.company_id;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "在ida_en_two平台上，利用硬件TEE，从m_customer_info表中查询与param1匹配的邮箱对应的电子邮件地址和年龄信息。",
+    "target_pql": "SELECT ida_en_two.m_customer_info.email, ida_en_two.m_customer_info.age WHERE ida_en_two.m_customer_info.email = param1 USING TEE;",
+    "predicted_pql": "SELECT ida_en_two.m_customer_info.email, ida_en_two.m_customer_info.age WHERE ida_en_two.m_customer_info.email_id = param1 USING TEE;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "借助安全TEE硬件，从ida_en_customers平台的t_customer_details表中获取与param_customer_num对应的客户姓名和地址。",
+    "target_pql": "SELECT ida_en_customers.t_customer_details.name, ida_en_customers.t_customer_details.address WHERE ida_en_customers.t_customer_details.customer_num = param_customer_num USING TEE;",
+    "predicted_pql": "SELECT ida_en_customers.t_customer_details.name, ida_en_customers.t_customer_details.address WHERE ida_en_customers.t_customer_details.customer_num = param_customer_num USING TEE;",
+    "correct": true
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在ida_en_two.m_enterprise_1w表中，如何查询socialid以'A'开头的记录的最低余额？",
+    "target_pql": "SELECT MIN(ida_en_two.m_enterprise_1w.balance) FROM ida_en_two.m_enterprise_1w WHERE ida_en_two.m_enterprise_1w.socialid LIKE 'A%'",
+    "predicted_pql": "SELECT MIN(ida_en_two.m_enterprise_1w.balance) FROM ida_en_two.m_enterprise_1w WHERE ida_en_two.m_enterprise_1w.socialid LIKE 'A%'",
+    "correct": true
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "怎样利用TEE硬件安全地计算budget_one和budget_two数据集的支出总和？",
+    "target_pql": "select /*+ FUNC(TEE) */ sumonly02(key = budget_one.expense_id, a = budget_one.amount, b = budget_two.amount) from budget_one, budget_two;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ sumonly02(key = budget_one.expense_id, a = budget_one.amount, b = budget_two.amount) from budget_one, budget_two;",
+    "correct": true
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在TEE环境中，如何从accounting_platform平台的finance_table表中计算出与变量account对应的所有支出总额？",
+    "target_pql": "SET account = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc021(sum(accounting_platform.finance_table.expenditure)) FROM accounting_platform.finance_table WHERE accounting_platform.finance_table.account_id = account",
+    "predicted_pql": "SET account = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(sum(accounting_platform.finance_table.expense)) FROM accounting_platform.finance_table WHERE accounting_platform.finance_table.account_id = account",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIR",
+    "question": "如何利用TEE在ida_en_two平台上安全查询m_order_records表中与param15匹配的order_id对应的订单总额和物流状态？",
+    "target_pql": "SELECT ida_en_two.m_order_records.order_total, ida_en_two.m_order_records.shipment_status WHERE ida_en_two.m_order_records.order_id = param15 USING TEE;",
+    "predicted_pql": "SELECT ida_en_two.m_order_records.order_total, ida_en_two.m_order_records.logistics_status WHERE ida_en_two.m_order_records.order_id = param15 USING TEE;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "在TEE环境下，如何查询store_main库中stock_levels表中状态为'critical'的最低库存水平？",
+    "target_pql": "select /*+ FUNC(TEE) */ min(a = store_main.stock_levels.level) from store_main.stock_levels where store_main.stock_levels.status = 'critical';",
+    "predicted_pql": "select /*+ FUNC(TEE) */ min(a = store_main.stock_levels.inventory_level) from store_main.stock_levels where store_main.stock_levels.status = 'critical';",
+    "correct": false
+  },
+  {
+    "scene": "hardware_MPC",
+    "question": "在TEE硬件环境下，如何安全地识别出dept_A和dept_B的projects表中重复的项目代码？",
+    "target_pql": "select /*+ FUNC(TEE) */ intersect(a = dept_A.projects.code, b = dept_B.projects.code) from dept_A.projects, dept_B.projects;",
+    "predicted_pql": "select /*+ FUNC(TEE) */ intersect(a = dept_A.projects.project_code, b = dept_B.projects.project_code) from dept_A.projects, dept_B.projects;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PIRMPC",
+    "question": "在TEE中，如何计算 innovation_platform 平台的 project_funding 表中指定融资轮次的所有项目成本总和？",
+    "target_pql": "SET funding_round = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc002(sum(innovation_platform.project_funding.cost)) FROM innovation_platform.project_funding WHERE innovation_platform.project_funding.funding_round = funding_round",
+    "predicted_pql": "SET funding_round = ?; SELECT /*+ FULLY_COV(TEE) */ pirmpc003(sum(innovation_platform.project_funding.cost)) FROM innovation_platform.project_funding WHERE innovation_platform.project_funding.funding_round = funding_round;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "在ida_en_two平台的shipment_details表中，如何通过指定的运单号查询对应的发货日期和交付状态？",
+    "target_pql": "SELECT ida_en_two.shipment_details.shipment_date, ida_en_two.shipment_details.delivery_status FROM ida_en_two.shipment_details WHERE ida_en_two.shipment_details.tracking_number = $param1",
+    "predicted_pql": "SELECT ida_en_two.shipment_details.shipping_date, ida_en_two.shipment_details.delivery_status FROM ida_en_two.shipment_details WHERE ida_en_two.shipment_details.tracking_number = $param1;",
+    "correct": false
+  },
+  {
+    "scene": "Federated_learning",
+    "question": "如何将plat1的客户信息表（customer_demographics）与plat2的购买记录表（purchase_history）结合，用于特征工程，并以plat2.purchase_history.purchased字段作为标签来训练HELR模型？",
+    "target_pql": "SELECT SEQUENCE(FE(model_name=HESCALE, label=plat2.purchase_history.purchased, features=[plat1.customer_demographics.*, plat2.purchase_history.*]), TRAIN(model_name=HELR, label=plat2.purchase_history.purchased)) FROM plat1.customer_demographics, plat2.purchase_history WHERE plat1.customer_demographics.user_id = plat2.purchase_history.user_id;",
+    "predicted_pql": "SELECT SEQUENCE(FE(model_name=HESCALE, label=plat2.purchase_history.purchased), TRAIN(model_name=HELR, label=plat2.purchase_history.purchased)) FROM plat1.customer_demographics, plat2.purchase_history WHERE plat1.customer_demographics.customer_id = plat2.purchase_history.customer_id;",
+    "correct": false
+  },
+  {
+    "scene": "software_PIR",
+    "question": "怎样根据学生ID，从ida_en_one库的student_attendance表中查询学生的出勤率和成绩？",
+    "target_pql": "SELECT ida_en_one.student_attendance.attendance_percentage, ida_en_one.student_attendance.grade FROM ida_en_one.student_attendance WHERE ida_en_one.student_attendance.student_id = $param1",
+    "predicted_pql": "SELECT ida_en_one.student_attendance.attendance_rate, ida_en_one.student_attendance.grade FROM ida_en_one.student_attendance WHERE ida_en_one.student_attendance.student_id = $param1;",
+    "correct": false
+  },
+  {
+    "scene": "software_MPC",
+    "question": "如何通过安全计算从ida_en_seven平台的m_tenant_3y表中找出花费最高的租户？",
+    "target_pql": "SELECT tenant_id, MAX(spend) FROM ida_en_seven.m_tenant_3y GROUP BY tenant_id;",
+    "predicted_pql": "SELECT tenant_name FROM ida_en_seven.m_tenant_3y ORDER BY total_cost DESC LIMIT 1;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "如何通过TEE安全识别出transport_platform平台的fleet_management表与safety_platform平台的accident_reports表中共有的车辆ID？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ transport_platform.fleet_management.vehicle_id FROM transport_platform.fleet_management, safety_platform.accident_reports WHERE transport_platform.fleet_management.vehicle_id = safety_platform.accident_reports.vehicle_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ transport_platform.fleet_management.vehicle_id FROM transport_platform.fleet_management, safety_platform.accident_reports WHERE transport_platform.fleet_management.vehicle_id = safety_platform.accident_reports.vehicle_id;",
+    "correct": false
+  },
+  {
+    "scene": "hardware_PSI",
+    "question": "如何通过TEE实现隐私保护，基于contract_id关联ida_en_one平台中的contract_info_1w表与ida_en_two平台中的contract_trials_1w表，并提取对应的试验状态？",
+    "target_pql": "SELECT /*+ JOIN(TEE) */ ida_en_two.contract_trials_1w.trial_status FROM ida_en_one.contract_info_1w, ida_en_two.contract_trials_1w WHERE ida_en_one.contract_info_1w.contract_id = ida_en_two.contract_trials_1w.contract_id",
+    "predicted_pql": "SELECT /*+ JOIN(TEE) */ ida_en_two.contract_trials_1w.trial_status FROM ida_en_one.contract_info_1w, ida_en_two.contract_trials_1w WHERE ida_en_one.contract_info_1w.contract_id = ida_en_two.contract_trials_1w.contract_id;",
+    "correct": false
+  }
+]

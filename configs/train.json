@@ -1,6 +1,6 @@
 {
-    "model_path": "/data0/csu/models/Qwen-Qwen2.5-1.5B-Instruct",
-    "data_path": "./PQL_generate/pql_dataset.json",
+    "model_path": "/data1/public/hf/Qwen/Qwen2.5-7B-Instruct",
+    "data_path": "./PQL_generate/augmented_dataset.json",
     "save_path": "./checkpoints/qwen-lora-pql",
     "example_path": "scene_examples.json",
     "split_ratio": 0.8,
