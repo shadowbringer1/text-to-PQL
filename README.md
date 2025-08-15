@@ -53,7 +53,7 @@ python finetune.py configs/train.json
 
 ```bash
 python inference.py \
-  --base_model_path /data0/csu/models/Qwen-Qwen2.5-1.5B-Instruct \
+  --base_model_path ./Qwen-Qwen2.5-1.5B-Instruct \
   --lora_model_path ./checkpoints/qwen-lora-pql/checkpoint-333
 ```
 

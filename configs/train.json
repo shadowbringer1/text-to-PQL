@@ -1,5 +1,5 @@
 {
-    "model_path": "/data0/csu/models/Qwen-Qwen2.5-1.5B-Instruct",
+    "model_path": "./Qwen-Qwen2.5-1.5B-Instruct",
     "data_path": "./PQL_generate/pql_dataset.json",
     "save_path": "./checkpoints/qwen-lora-pql",
     "example_path": "scene_examples.json",

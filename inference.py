@@ -84,6 +84,14 @@ def main():
         device_map="auto",
         trust_remote_code=True
     )
+
+    # base_model = AutoModelForCausalLM.from_pretrained(
+    #     args.base_model_path,
+    #     device_map="auto",
+    #     load_in_8bit=True,
+    #     low_cpu_mem_usage=True,
+    #     trust_remote_code=True
+    # )
     model = PeftModel.from_pretrained(base_model, args.lora_model_path)
     model.eval()
 
