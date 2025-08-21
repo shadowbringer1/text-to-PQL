@@ -53,11 +53,12 @@ python finetune.py configs/train.json
 
 ```bash
 python inference.py \
-  --base_model_path ./Qwen-Qwen2.5-1.5B-Instruct \
-  --lora_model_path ./checkpoints/qwen-lora-pql/checkpoint-333
+  --base_model_path /data1/public/hf/Qwen/
+   \
+  --lora_model_path ./checkpoints/qwen-lora-pql/checkpoint-441
 ```
 
-- `--base_model_path`：填写原始基础模型的路径（如 Qwen2.5-1.5B-Instruct）
+- `--base_model_path`：填写原始基础模型的路径（如 Qwen2.5-7B-Instruct）
 - `--lora_model_path`：填写你训练后保存的 LoRA 权重路径
 
 ### 🔁 交互式使用方式
@@ -86,6 +87,39 @@ python inference.py \
 ```
 
 你可以连续多轮交互，输入 `exit` 退出。
+
+## 模型评估（Evaluate）
+你可以使用评估脚本对模型在测试集上的表现进行评估，采用严格字符串匹配的方式计算准确率。
+
+### 数据要求
+
+测试集为 JSON 格式，文件为`./PQL_generate/test_data.json`，每条样本包含：
+
+```json
+{
+  "scene": "Federated_learning",
+  "Chinese_question": "如何利用plat31的employee_records来训练HELR模型...",
+  "PQL_query": "SELECT TRAIN(...) FROM ...;"
+}
+```
+
+### 评估命令
+```bash
+python evaluate.py \
+  --base_model_path /data1/public/hf/Qwen/Qwen2.5-7B-Instruct \
+  --lora_model_path ./checkpoints/qwen-lora-pql/checkpoint-441 \
+  --test_file ./PQL_generate/test_data.json
+```
+
+### 输出结果
+最终在终端中输出整体准确率：
+
+```text
+总样本数: 100
+正确预测数: 83
+准确率: 83.00%
+```
+此外，会将详细预测结果保存为 `evaluation_results.json`。
 
 ## 其他细节
 
