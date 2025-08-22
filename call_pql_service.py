@@ -114,7 +114,7 @@ def main():
             print(current_pql, end="", flush=True)
             sys.stdout.flush()
 
-    print("====================")
+    print("\n====================")
 
 
 if __name__ == "__main__":
