@@ -14,9 +14,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # 设置CPU线程数（根据实际核心数调整）
-os.environ["OMP_NUM_THREADS"] = "64"
-os.environ["MKL_NUM_THREADS"] = "64"
-torch.set_num_threads(64)
+os.environ["OMP_NUM_THREADS"] = "128"
+os.environ["MKL_NUM_THREADS"] = "128"
+torch.set_num_threads(128)
 
 # 全局变量（模型和Tokenizer加载后缓存）
 app = Flask(__name__)
