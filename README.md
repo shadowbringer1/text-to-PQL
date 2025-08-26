@@ -107,18 +107,10 @@ python inference.py \
 python evaluate.py \
   --base_model_path /data1/public/hf/Qwen/Qwen2.5-7B-Instruct \
   --lora_model_path ./checkpoints/qwen-lora-pql/checkpoint-441 \
-  --test_file ./PQL_generate/test_data.json
+  --test_file ./PQL_generate/test_set.json
 ```
 
-### 输出结果
-最终在终端中输出整体准确率：
-
-```text
-总样本数: 100
-正确预测数: 83
-准确率: 83.00%
-```
-此外，会将详细预测结果保存为 `evaluation_results.json`。
+详细预测结果将保存为 `evaluation_results.json`。
 
 ## 其他细节
 
