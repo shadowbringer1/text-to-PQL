@@ -1,6 +1,18 @@
 import requests
 import json
 import sys
+import time
+
+
+def time_compute(func):
+    def warpper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        print(f"Function '{func.__name__}' executed in {end_time - start_time:.4f} seconds")
+        return result
+
+    return warpper
 
 
 def call_pql_service_stream(scene, question, service_url):
@@ -85,6 +97,7 @@ def call_pql_service_stream(scene, question, service_url):
         }
 
 
+@time_compute
 def main():
     # 解析命令行参数
     scene_list = ['software_PSI', 'software_MPC', 'software_PIR', 'hardware_PSI', 'hardware_MPC',
