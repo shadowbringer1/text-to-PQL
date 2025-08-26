@@ -45,7 +45,8 @@ def generate_pql(model, tokenizer, prompt, max_new_tokens=1024):
             **inputs,
             max_new_tokens=max_new_tokens,
             do_sample=False,
-            eos_token_id=tokenizer.eos_token_id
+            eos_token_id=tokenizer.eos_token_id,   # 指定停止 token
+            pad_token_id=tokenizer.eos_token_id    # 防止 warning/错误
         )
     output_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
     response = output_text[len(prompt):].strip()
@@ -79,6 +80,11 @@ def main():
 
     # 加载模型
     tokenizer = AutoTokenizer.from_pretrained(args.base_model_path, trust_remote_code=True)
+
+    # 确保 pad_token 存在
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
     base_model = AutoModelForCausalLM.from_pretrained(
         args.base_model_path,
         torch_dtype=torch.float16,
@@ -103,13 +109,6 @@ def main():
 
         is_correct = pred_pql == target_pql
         correct += int(is_correct)
-
-        # # 打印当前样本详情
-        # print(f"\n[样本]")
-        # print(f"场景: {scene}")
-        # print(f"问题: {question}")
-        # print(f"生成结果: {pred_pql}")
-        # print(f"是否正确: {'✅ 正确' if is_correct else '❌ 错误'}")
 
         results.append({
             "scene": scene,

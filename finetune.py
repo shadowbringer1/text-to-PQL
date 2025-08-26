@@ -75,8 +75,14 @@ def load_and_split_data(data_path: str, example_path: str, split_ratio=0.8):
     return Dataset.from_list(train_samples), Dataset.from_list(val_samples)
 
 def tokenize_function(example, tokenizer, max_length):
-    full_text = example["input"] + example["label"]
-    model_inputs = tokenizer(full_text, max_length=max_length, truncation=True, padding="max_length")
+    # 在 label 后面加上 eos token，确保模型学会终止
+    full_text = example["input"] + example["label"] + tokenizer.eos_token
+    model_inputs = tokenizer(
+        full_text,
+        max_length=max_length,
+        truncation=True,
+        padding="max_length"
+    )
     model_inputs["labels"] = model_inputs["input_ids"].copy()
     return model_inputs
 
@@ -90,6 +96,11 @@ def main():
         cfg = json.load(f)
 
     tokenizer = AutoTokenizer.from_pretrained(cfg["model_path"], trust_remote_code=True)
+
+    # 如果 tokenizer 没有 pad_token，手动设置为 eos_token
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
     model = AutoModelForCausalLM.from_pretrained(
         cfg["model_path"],
         torch_dtype=torch.float16,

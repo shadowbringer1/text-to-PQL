@@ -4,10 +4,8 @@ import json
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
 
-# 示例路径写死在代码中
 EXAMPLE_PATH = "scene_examples.json"
 
-# 场景描述映射
 scene_name_map = {
     "software_PSI": "软件PSI",
     "software_MPC": "软件MPC",
@@ -19,7 +17,6 @@ scene_name_map = {
     "Federated_learning": "联邦学习"
 }
 
-# 构造Prompt（优化版）
 def build_prompt(scene_name, chinese_question, scene_examples=None):
     scene_desc = scene_name_map.get(scene_name, "未知场景")
     prompt = f"""你是一个专注于“{scene_desc}”任务的 PQL 查询生成助手。请严格按照以下要求完成任务：
@@ -40,7 +37,6 @@ def build_prompt(scene_name, chinese_question, scene_examples=None):
     prompt += f"\n请根据下方问题直接生成对应的 PQL 查询语句：\n问题：{chinese_question}\nPQL："
     return prompt
 
-# 调用模型生成
 def generate_pql(model, tokenizer, prompt, max_new_tokens=1024):
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
     with torch.no_grad():
@@ -48,9 +44,12 @@ def generate_pql(model, tokenizer, prompt, max_new_tokens=1024):
             **inputs,
             max_new_tokens=max_new_tokens,
             do_sample=False,
-            eos_token_id=tokenizer.eos_token_id
+            eos_token_id=tokenizer.eos_token_id,   # 指定停止 token
+            pad_token_id=tokenizer.eos_token_id    # 防止 warning
         )
     output_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+    # 截掉 prompt 部分，只保留模型生成的内容
     response = output_text[len(prompt):].strip()
 
     # 截断无关内容
@@ -63,7 +62,6 @@ def generate_pql(model, tokenizer, prompt, max_new_tokens=1024):
 
     return response
 
-# 主程序
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--base_model_path", type=str, required=True)
@@ -76,6 +74,11 @@ def main():
 
     # 加载模型
     tokenizer = AutoTokenizer.from_pretrained(args.base_model_path, trust_remote_code=True)
+
+    # 确保 pad_token 存在
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
     base_model = AutoModelForCausalLM.from_pretrained(
         args.base_model_path,
         torch_dtype=torch.float16,
