@@ -92,7 +92,7 @@ python inference.py \
 
 ### 数据要求
 
-测试集为 JSON 格式，文件为`./PQL_generate/test_data.json`，每条样本包含：
+测试集为 JSON 格式，文件为`./PQL_generate/test_set.json`，每条样本包含：
 
 ```json
 {
